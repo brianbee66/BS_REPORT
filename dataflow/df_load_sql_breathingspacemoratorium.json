@@ -1,0 +1,122 @@
+{
+	"name": "df_load_sql_breathingspacemoratorium",
+	"properties": {
+		"folder": {
+			"name": "Load/BSS"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_reporting_adls",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sourceODS"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_reporting_lookup_mssql",
+						"type": "DatasetReference"
+					},
+					"name": "sourceSQLLookupBstFk"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_reporting_lookup_mssql",
+						"type": "DatasetReference"
+					},
+					"name": "sourceSQLLookupMaoFk"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_reporting_lookup_mssql",
+						"type": "DatasetReference"
+					},
+					"name": "sourceLookupBsStatusTypeFk"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_reporting_lookup_mssql",
+						"type": "DatasetReference"
+					},
+					"name": "sourceLookupBsDebtorFk"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_reporting_lookup_mssql",
+						"type": "DatasetReference"
+					},
+					"name": "sourceLookupParentCrFk"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_reporting_lookup_mssql",
+						"type": "DatasetReference"
+					},
+					"name": "sourceLookupChildCrFk"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_reporting_mssql",
+						"type": "DatasetReference"
+					},
+					"name": "sinkSQL"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectODS"
+				},
+				{
+					"name": "dcolSQL"
+				},
+				{
+					"name": "JoinSQLLookupBstFk"
+				},
+				{
+					"name": "AlterRowSQL"
+				},
+				{
+					"name": "SelectSQLLookupBstFk"
+				},
+				{
+					"name": "FilterODS"
+				},
+				{
+					"name": "SelectLookupMaoFK"
+				},
+				{
+					"name": "SelectLookupBsStatusTypeFk"
+				},
+				{
+					"name": "SelectLookupBsDebtorFk"
+				},
+				{
+					"name": "SelectLookupParentCrFk"
+				},
+				{
+					"name": "SelectLookupChildCrFk"
+				},
+				{
+					"name": "JoinLookupMaoFk"
+				},
+				{
+					"name": "JoinLookupBsStatusTypeFk"
+				},
+				{
+					"name": "JoinLookupBsDebtorFk"
+				},
+				{
+					"name": "JoinLookupParentCrFk"
+				},
+				{
+					"name": "JoinLookupChildCrFk"
+				}
+			],
+			"script": "parameters{\n\tpartdistFrom as string\n}\nsource(output(\n\t\tstatecode as string,\n\t\tstatuscode as string,\n\t\tntt_breathingspacetypeid as string,\n\t\tcreatedon as string,\n\t\tntt_debtorid as string,\n\t\townerid as string,\n\t\tmodifiedon as string,\n\t\tntt_activeregister as string,\n\t\tntt_triggerpointofcontactsubmitnotification as string,\n\t\tmodifiedby as string,\n\t\tntt_referencenumber as string,\n\t\tntt_triggerdebtorsubmitnotification as string,\n\t\tcreatedby as string,\n\t\tntt_breathingspacestatusid as string,\n\t\towningbusinessunit as string,\n\t\tntt_breathingspacemoratoriumid as string,\n\t\tntt_name as string,\n\t\towninguser as string,\n\t\tntt_midwayquestionanswer as string,\n\t\tntt_commencementdate as string,\n\t\tntt_retentionperiodenddate as string,\n\t\tntt_retentionperiodstartdate as string,\n\t\tntt_closuredate as string,\n\t\tntt_submissiondate as string,\n\t\tntt_activeregisterperiodstartdate as string,\n\t\tntt_parentcancellationreasonid as string,\n\t\tntt_expirydate as string,\n\t\tntt_activeregisterperiodenddate as string,\n\t\tntt_midwayquestionrequired as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date,\n\t\tntt_mhreviewquestionrequired as string,\n\t\tntt_managingmoneyadviserorganisationid as string,\n\t\tntt_createdfromapi as string,\n\t\tntt_mhreviewquestionanswer as string,\n\t\tblIsValid as boolean,\n\t\ttsCreatedOn as timestamp,\n\t\ttsModifiedOn as timestamp,\n\t\ttsNTTActiveRegisterPeriodStartDate as timestamp,\n\t\tstrNTTBreathingSpaceMoratoriumId as string,\n\t\tstrNTTBreathingSpaceStatusId as string,\n\t\tstrNTTBreathingSpaceTypeId as string,\n\t\tstrNTTChildCancellationReasonId as string,\n\t\ttsNTTClosureDate as timestamp,\n\t\ttsNTTCommencementDate as timestamp,\n\t\tblNTTCreatedFromAPI as boolean,\n\t\tstrNTTDebtorId as string,\n\t\ttsNTTExpiryDate as timestamp,\n\t\tstrNTTManagingMoneyAdviserOrganisationId as string,\n\t\tstrNTTParentCancellationReasonId as string,\n\t\ttsNTTRemovedFromRegisterDate as timestamp,\n\t\ttsNTTSubmissionDate as timestamp,\n\t\tblNTTActiveRegister as boolean,\n\t\tblIsTruncate as boolean\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'delta',\n\tfileSystem: 'curation',\n\tfolderPath: 'ods/bss/dynamics/moratoriums/breathingspacemoratorium') ~> sourceODS\nsource(output(\n\t\tbst_pk_skey as integer,\n\t\tisValid as boolean,\n\t\tisTruncate as boolean,\n\t\tbatch_id as integer,\n\t\tcreatedon as timestamp,\n\t\tmodifiedon as timestamp,\n\t\tntt_name as string,\n\t\tntt_breathingspacetypeid as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> sourceSQLLookupBstFk\nsource(output(\n\t\tmao_pk_skey as integer,\n\t\tisValid as boolean,\n\t\tbatch_id as integer,\n\t\tcreatedon as timestamp,\n\t\tmodifiedon as timestamp,\n\t\tisTruncate as boolean,\n\t\tinss_name as string,\n\t\tinss_moneyadviserorganisationid as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> sourceSQLLookupMaoFk\nsource(output(\n\t\tbs_status_type_pk_skey as integer,\n\t\tntt_name as string,\n\t\tntt_breathingspacestatustypeid as string,\n\t\tisValid as boolean,\n\t\tisTruncate as boolean,\n\t\tbatch_id as integer,\n\t\tcreatedon as timestamp,\n\t\tmodifiedon as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> sourceLookupBsStatusTypeFk\nsource(output(\n\t\tbs_debtor_pk_skey as integer,\n\t\tntt_breathingspacedebtorid as string,\n\t\tntt_addresswithheld as boolean,\n\t\tntt_name as string,\n\t\tdebtor_age_band as string,\n\t\tcreatedon as timestamp,\n\t\tmodifiedon as timestamp,\n\t\tisValid as boolean,\n\t\tisTruncate as boolean,\n\t\tbatch_id as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> sourceLookupBsDebtorFk\nsource(output(\n\t\tparent_cr_pk_skey as integer,\n\t\tntt_moratoriumparentcancellationreasonid as string,\n\t\tisValid as boolean,\n\t\tisTruncate as boolean,\n\t\tbatch_id as integer,\n\t\tcreatedon as timestamp,\n\t\tmodifiedon as timestamp,\n\t\tntt_name as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> sourceLookupParentCrFk\nsource(output(\n\t\tchild_cr_pk_skey as integer,\n\t\tntt_moratoriumchildcancellationreasonid as string,\n\t\tisValid as boolean,\n\t\tisTruncate as boolean,\n\t\tbatch_id as integer,\n\t\tcreatedon as timestamp,\n\t\tmodifiedon as timestamp,\n\t\tntt_name as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> sourceLookupChildCrFk\nJoinLookupChildCrFk select(mapColumn(\n\t\tbatch_id = intBatchId,\n\t\tisValid = blIsValid,\n\t\tcreatedon = tsCreatedOn,\n\t\tmodifiedon = tsModifiedOn,\n\t\tntt_activeregisterperiodstartdate = tsNTTActiveRegisterPeriodStartDate,\n\t\tntt_breathingspacemoratoriumid = strNTTBreathingSpaceMoratoriumId,\n\t\tntt_closuredate = tsNTTClosureDate,\n\t\tntt_commencementdate = tsNTTCommencementDate,\n\t\tntt_createdfromapi = blNTTCreatedFromAPI,\n\t\tntt_expirydate = tsNTTExpiryDate,\n\t\tntt_removedfromregisterdate = tsNTTRemovedFromRegisterDate,\n\t\tntt_submissiondate = tsNTTSubmissionDate,\n\t\tntt_activeregister = blNTTActiveRegister,\n\t\tisTruncate = blIsTruncate,\n\t\tbst_fk = bst_pk_skey,\n\t\tmao_fk = mao_pk_skey,\n\t\tbs_status_type_fk = bs_status_type_pk_skey,\n\t\tbs_debtor_fk = bs_debtor_pk_skey,\n\t\tparent_cr_fk = parent_cr_pk_skey,\n\t\tchild_cr_fk = child_cr_pk_skey\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectODS\nSelectODS derive(ntt_breathingspacemoratoriumid = coalesce(ntt_breathingspacemoratoriumid, 'unknown'),\n\t\tcreatedon_dimdate_fk = iif(createdon == toTimestamp('1900-01-01 00:00:00'), -1, toInteger(toString(createdon, 'yyyyMMdd'))),\n\t\tmodifiedon_dimdate_fk = iif(modifiedon == toTimestamp('1900-01-01 00:00:00'), -1, toInteger(toString(modifiedon, 'yyyyMMdd'))),\n\t\tntt_commencementdate_dimdate_fk = iif(ntt_commencementdate == toTimestamp('1900-01-01 00:00:00'), -1, toInteger(toString(ntt_commencementdate, 'yyyyMMdd'))),\n\t\tntt_closuredate_dimdate_fk = iif(ntt_closuredate == toTimestamp('1900-01-01 00:00:00'), -1, toInteger(toString(ntt_closuredate, 'yyyyMMdd'))),\n\t\tntt_expirydate_dimdate_fk = iif(ntt_expirydate == toTimestamp('1900-01-01 00:00:00'), -1, toInteger(toString(ntt_expirydate, 'yyyyMMdd'))),\n\t\tntt_submissiondate_dimdate_fk = iif(ntt_submissiondate == toTimestamp('1900-01-01 00:00:00'), -1, toInteger(toString(ntt_submissiondate, 'yyyyMMdd'))),\n\t\tntt_activeregisterperiodstartdate_dimdate_fk = iif(ntt_activeregisterperiodstartdate == toTimestamp('1900-01-01 00:00:00'), -1, toInteger(toString(ntt_activeregisterperiodstartdate, 'yyyyMMdd'))),\n\t\tntt_removedfromregisterdate_dimdate_fk = iif(ntt_removedfromregisterdate == toTimestamp('1900-01-01 00:00:00'), -1, toInteger(toString(ntt_removedfromregisterdate, 'yyyyMMdd')))) ~> dcolSQL\nFilterODS, SelectSQLLookupBstFk join(strNTTBreathingSpaceTypeId == SelectSQLLookupBstFk@ntt_breathingspacetypeid,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinSQLLookupBstFk\ndcolSQL alterRow(upsertIf(true())) ~> AlterRowSQL\nsourceSQLLookupBstFk select(mapColumn(\n\t\tbst_pk_skey,\n\t\tntt_breathingspacetypeid\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSQLLookupBstFk\nsourceODS filter(partdist >= toDate($partdistFrom)) ~> FilterODS\nsourceSQLLookupMaoFk select(mapColumn(\n\t\tmao_pk_skey,\n\t\tinss_moneyadviserorganisationid\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectLookupMaoFK\nsourceLookupBsStatusTypeFk select(mapColumn(\n\t\tbs_status_type_pk_skey,\n\t\tntt_breathingspacestatustypeid\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectLookupBsStatusTypeFk\nsourceLookupBsDebtorFk select(mapColumn(\n\t\tbs_debtor_pk_skey,\n\t\tntt_breathingspacedebtorid\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectLookupBsDebtorFk\nsourceLookupParentCrFk select(mapColumn(\n\t\tparent_cr_pk_skey,\n\t\tntt_moratoriumparentcancellationreasonid\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectLookupParentCrFk\nsourceLookupChildCrFk select(mapColumn(\n\t\tchild_cr_pk_skey,\n\t\tntt_moratoriumchildcancellationreasonid\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectLookupChildCrFk\nJoinSQLLookupBstFk, sourceSQLLookupMaoFk join(strNTTManagingMoneyAdviserOrganisationId == inss_moneyadviserorganisationid,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinLookupMaoFk\nJoinLookupMaoFk, SelectLookupBsStatusTypeFk join(strNTTBreathingSpaceStatusId == ntt_breathingspacestatustypeid,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinLookupBsStatusTypeFk\nJoinLookupBsStatusTypeFk, SelectLookupBsDebtorFk join(strNTTDebtorId == ntt_breathingspacedebtorid,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinLookupBsDebtorFk\nJoinLookupBsDebtorFk, SelectLookupParentCrFk join(strNTTParentCancellationReasonId == ntt_moratoriumparentcancellationreasonid,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinLookupParentCrFk\nJoinLookupParentCrFk, SelectLookupChildCrFk join(strNTTChildCancellationReasonId == ntt_moratoriumchildcancellationreasonid,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinLookupChildCrFk\nAlterRowSQL sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['ntt_breathingspacemoratoriumid'],\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sinkSQL"
+		}
+	}
+}

@@ -1,0 +1,38 @@
+{
+	"name": "df_curation_staging_partition",
+	"properties": {
+		"folder": {
+			"name": "Transform/BSS"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_csv",
+						"type": "DatasetReference"
+					},
+					"name": "sourceLanding"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sinkCurationStagingPartition"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedPartCols"
+				},
+				{
+					"name": "dcolBatchId"
+				}
+			],
+			"script": "parameters{\n\tpartDistAttr as string,\n\tpintBatchId as integer\n}\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tmoveFiles: ['',('archive/' + toString($pintBatchId))]) ~> sourceLanding\nsourceLanding derive(partdist = toDate($partDistAttr)) ~> derivedPartCols\nderivedPartCols derive(intBatchId = $pintBatchId) ~> dcolBatchId\ndcolBatchId sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\ttruncate: true,\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('key',\n\t\t0,\n\t\tpartdist\n\t)) ~> sinkCurationStagingPartition"
+		}
+	}
+}

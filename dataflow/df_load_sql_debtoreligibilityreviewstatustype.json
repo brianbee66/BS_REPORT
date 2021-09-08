@@ -1,0 +1,44 @@
+{
+	"name": "df_load_sql_debtoreligibilityreviewstatustype",
+	"properties": {
+		"folder": {
+			"name": "Load/BSS"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_reporting_adls",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sourceODS"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_reporting_mssql",
+						"type": "DatasetReference"
+					},
+					"name": "sinkSQL"
+				}
+			],
+			"transformations": [
+				{
+					"name": "AlterRowSQL"
+				},
+				{
+					"name": "SelectODS"
+				},
+				{
+					"name": "dcolSQL"
+				},
+				{
+					"name": "FilterODS"
+				}
+			],
+			"script": "parameters{\n\tpartdistFrom as string\n}\nsource(output(\n\t\torganizationid as string,\n\t\tntt_identifier as string,\n\t\tntt_name as string,\n\t\tntt_debtoreligibilitystatustypeid as string,\n\t\tstatuscode as string,\n\t\tcreatedby as string,\n\t\tmodifiedon as string,\n\t\tmodifiedby as string,\n\t\tcreatedon as string,\n\t\tstatecode as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date,\n\t\tblIsValid as boolean,\n\t\ttsCreatedOn as timestamp,\n\t\ttsModifiedOn as timestamp,\n\t\tstrNTTDebtorEligibilityStatusTypeId as string,\n\t\tstrNTTName as string,\n\t\tblIsTruncate as boolean\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'delta',\n\tfileSystem: 'curation',\n\tfolderPath: 'ods/bss/dynamics/debtors/debtoreligibilitystatustype') ~> sourceODS\ndcolSQL alterRow(upsertIf(true())) ~> AlterRowSQL\nFilterODS select(mapColumn(\n\t\tbatch_id = intBatchId,\n\t\tisValid = blIsValid,\n\t\tcreatedon = tsCreatedOn,\n\t\tmodifiedon = tsModifiedOn,\n\t\tntt_debtoreligibilitystatustypeid = strNTTDebtorEligibilityStatusTypeId,\n\t\tntt_name = strNTTName,\n\t\tisTruncate = blIsTruncate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectODS\nSelectODS derive(ntt_name = coalesce(ntt_name, 'unknown'),\n\t\tcreatedon_dimdate_fk = iif(createdon == toTimestamp('1900-01-01 00:00:00'), -1, toInteger(toString(createdon, 'yyyyMMdd'))),\n\t\tmodifiedon_dimdate_fk = iif(modifiedon == toTimestamp('1900-01-01 00:00:00'), -1, toInteger(toString(modifiedon, 'yyyyMMdd')))) ~> dcolSQL\nsourceODS filter(partdist >= toDate($partdistFrom)) ~> FilterODS\nAlterRowSQL sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['ntt_debtoreligibilitystatustypeid'],\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sinkSQL"
+		}
+	}
+}

@@ -1,0 +1,16 @@
+{
+	"name": "ds_bss_postgres",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_govuknotify_postgres_shir",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "BSS/Notify"
+		},
+		"annotations": [],
+		"type": "AzurePostgreSqlTable",
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

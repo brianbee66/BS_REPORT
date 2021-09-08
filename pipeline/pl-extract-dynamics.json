@@ -1,0 +1,886 @@
+{
+	"name": "pl-extract-dynamics",
+	"properties": {
+		"activities": [
+			{
+				"name": "fel-extract-entity",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "lu-sourcemeta-adls-table-extract",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('lu-sourcemeta-adls-table-extract').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "cp-sourceentity-adls-csv",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "lu-batchparameter-adlstable-highwatermark",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DynamicsSource",
+									"query": {
+										"value": "@replace(item().SourceDeltaFilterQuery,'1900-01-01',activity('lu-batchparameter-adlstable-highwatermark').output.firstRow.HighWaterMarkMax)",
+										"type": "Expression"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"value": "@json(item().SourceSinkMapping)",
+									"type": "Expression"
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_bss_dynamics",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_bss_adls_csv",
+									"type": "DatasetReference",
+									"parameters": {
+										"sinkFilePath": {
+											"value": "@item().SinkFilePath",
+											"type": "Expression"
+										},
+										"sinkFileName": {
+											"value": "@item().SinkFileName",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "lu-batchparameter-adlstable-highwatermark",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureTableSource",
+									"azureTableSourceQuery": {
+										"value": "PartitionKey eq '@{concat(item().PartitionKey,'-',item().RowKey)}' and RowKey eq '@{pipeline().parameters.pintBatchId}'\n\n",
+										"type": "Expression"
+									},
+									"azureTableSourceIgnoreTableNotFound": false
+								},
+								"dataset": {
+									"referenceName": "ds_batchparameter_adls_table",
+									"type": "DatasetReference"
+								},
+								"firstRowOnly": true
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "lu-sourcemeta-adls-table-extract",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "fel-update-highwatermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceQuery": {
+							"value": "PartitionKey eq '@{pipeline().parameters.pstrSourceMetaPartitionKey}' and InUse eq '1' and SourceDeltaFilterQuery ne 'n/a'",
+							"type": "Expression"
+						},
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "ds_sourcemeta_adls_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "lu-sourcemeta-adlstable-highwatermark",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceQuery": {
+							"value": "PartitionKey eq '@{pipeline().parameters.pstrSourceMetaPartitionKey}'",
+							"type": "Expression"
+						},
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "ds_sourcemeta_adls_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "fel-update-highwatermark",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "lu-sourcemeta-adlstable-highwatermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('lu-sourcemeta-adlstable-highwatermark').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "If-update-highwatermark",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "lu-batchparameter-adlstable-hwm-update",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@and(equals(item().InUse,'1'),not(equals(item().HighWaterMarkQuery,'n/a')))",
+									"type": "Expression"
+								},
+								"ifFalseActivities": [
+									{
+										"name": "cp-batchparameter-adls-table_na",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "7.00:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "AzureTableSource",
+												"additionalColumns": [
+													{
+														"name": "batchPartitionKey",
+														"value": {
+															"value": "@concat(item().PartitionKey,'-',item().RowKey)",
+															"type": "Expression"
+														}
+													},
+													{
+														"name": "batchRowKey",
+														"value": {
+															"value": "@string(add(pipeline().parameters.pintBatchId,1))",
+															"type": "Expression"
+														}
+													},
+													{
+														"name": "batchHighWaterMarkMax",
+														"value": {
+															"value": "1900-01-01",
+															"type": "Expression"
+														}
+													},
+													{
+														"name": "batchHighWaterMarkMin",
+														"value": {
+															"value": "1900-01-01",
+															"type": "Expression"
+														}
+													}
+												],
+												"azureTableSourceQuery": {
+													"value": "PartitionKey eq '@{item().PartitionKey}' and RowKey eq '@{item().RowKey}'",
+													"type": "Expression"
+												},
+												"azureTableSourceIgnoreTableNotFound": false
+											},
+											"sink": {
+												"type": "AzureTableSink",
+												"azureTableInsertType": "merge",
+												"azureTablePartitionKeyName": {
+													"value": "PartitionKey",
+													"type": "Expression"
+												},
+												"azureTableRowKeyName": {
+													"value": "RowKey",
+													"type": "Expression"
+												},
+												"writeBatchSize": 10000
+											},
+											"enableStaging": false,
+											"translator": {
+												"type": "TabularTranslator",
+												"mappings": [
+													{
+														"source": {
+															"name": "batchPartitionKey",
+															"type": "String"
+														},
+														"sink": {
+															"name": "PartitionKey",
+															"type": "String"
+														}
+													},
+													{
+														"source": {
+															"name": "batchRowKey",
+															"type": "String"
+														},
+														"sink": {
+															"name": "RowKey",
+															"type": "String"
+														}
+													},
+													{
+														"source": {
+															"name": "Timestamp",
+															"type": "DateTimeOffset"
+														},
+														"sink": {
+															"name": "Timestamp",
+															"type": "DateTimeOffset"
+														}
+													},
+													{
+														"source": {
+															"name": "batchHighWaterMarkMax",
+															"type": "String"
+														},
+														"sink": {
+															"name": "HighWaterMarkMax",
+															"type": "DateTimeOffset"
+														}
+													},
+													{
+														"source": {
+															"name": "batchHighWaterMarkMin",
+															"type": "String"
+														},
+														"sink": {
+															"name": "HighWaterMarkMin",
+															"type": "String"
+														}
+													}
+												]
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "ds_sourcemeta_adls_table",
+												"type": "DatasetReference"
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "ds_batchparameter_adls_table",
+												"type": "DatasetReference"
+											}
+										]
+									}
+								],
+								"ifTrueActivities": [
+									{
+										"name": "cp-batchparameter-adls-table",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "7.00:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "DynamicsSource",
+												"additionalColumns": [
+													{
+														"name": "PartitionKey",
+														"value": {
+															"value": "@concat(item().PartitionKey,'-',item().RowKey)",
+															"type": "Expression"
+														}
+													},
+													{
+														"name": "RowKey",
+														"value": {
+															"value": "@string(add(pipeline().parameters.pintBatchId,1))",
+															"type": "Expression"
+														}
+													}
+												],
+												"query": {
+													"value": "@replace(item().HighWaterMarkQuery,'1900-01-01',activity('lu-batchparameter-adlstable-hwm-update').output.firstRow.HighWaterMarkMax)",
+													"type": "Expression"
+												}
+											},
+											"sink": {
+												"type": "AzureTableSink",
+												"azureTableInsertType": "merge",
+												"azureTablePartitionKeyName": {
+													"value": "PartitionKey",
+													"type": "Expression"
+												},
+												"azureTableRowKeyName": {
+													"value": "RowKey",
+													"type": "Expression"
+												},
+												"writeBatchSize": 10000
+											},
+											"enableStaging": false,
+											"translator": {
+												"type": "TabularTranslator",
+												"mappings": [
+													{
+														"source": {
+															"name": "PartitionKey",
+															"type": "String"
+														},
+														"sink": {
+															"name": "PartitionKey",
+															"type": "String"
+														}
+													},
+													{
+														"source": {
+															"name": "RowKey",
+															"type": "String"
+														},
+														"sink": {
+															"name": "RowKey",
+															"type": "String"
+														}
+													},
+													{
+														"source": {
+															"name": "HighWaterMarkValue",
+															"type": "DateTime"
+														},
+														"sink": {
+															"name": "HighWaterMarkMax",
+															"type": "String"
+														}
+													}
+												]
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "ds_bss_dynamics",
+												"type": "DatasetReference"
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "ds_batchparameter_adls_table",
+												"type": "DatasetReference"
+											}
+										]
+									}
+								]
+							}
+						},
+						{
+							"name": "lu-batchparameter-adlstable-batchid",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "If-update-highwatermark",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureTableSource",
+									"azureTableSourceQuery": {
+										"value": "PartitionKey eq '@{concat(item().PartitionKey,'-',item().RowKey)}' and RowKey eq '@{string(add(pipeline().parameters.pintBatchId,1))}'",
+										"type": "Expression"
+									},
+									"azureTableSourceIgnoreTableNotFound": false
+								},
+								"dataset": {
+									"referenceName": "ds_batchparameter_adls_table",
+									"type": "DatasetReference"
+								},
+								"firstRowOnly": true
+							}
+						},
+						{
+							"name": "If-hasrecord-batchid",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "lu-batchparameter-adlstable-batchid",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@contains(activity('lu-batchparameter-adlstable-batchid').output,'firstRow')",
+									"type": "Expression"
+								},
+								"ifFalseActivities": [
+									{
+										"name": "cp-batchparameter-adls-table-norecord",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "7.00:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "AzureTableSource",
+												"additionalColumns": [
+													{
+														"name": "batchPartitionKey",
+														"value": {
+															"value": "@concat(item().PartitionKey,'-',item().RowKey)",
+															"type": "Expression"
+														}
+													},
+													{
+														"name": "batchRowKey",
+														"value": {
+															"value": "@string(add(pipeline().parameters.pintBatchId,1))",
+															"type": "Expression"
+														}
+													},
+													{
+														"name": "batchHighWaterMarkMax",
+														"value": {
+															"value": "1900-01-01",
+															"type": "Expression"
+														}
+													},
+													{
+														"name": "batchHighWaterMarkMin",
+														"value": {
+															"value": "1900-01-01",
+															"type": "Expression"
+														}
+													}
+												],
+												"azureTableSourceQuery": {
+													"value": "PartitionKey eq '@{item().PartitionKey}' and RowKey eq '@{item().RowKey}'",
+													"type": "Expression"
+												},
+												"azureTableSourceIgnoreTableNotFound": false
+											},
+											"sink": {
+												"type": "AzureTableSink",
+												"azureTableInsertType": "merge",
+												"azureTablePartitionKeyName": {
+													"value": "PartitionKey",
+													"type": "Expression"
+												},
+												"azureTableRowKeyName": {
+													"value": "RowKey",
+													"type": "Expression"
+												},
+												"writeBatchSize": 10000
+											},
+											"enableStaging": false,
+											"translator": {
+												"type": "TabularTranslator",
+												"mappings": [
+													{
+														"source": {
+															"name": "batchPartitionKey",
+															"type": "String"
+														},
+														"sink": {
+															"name": "PartitionKey",
+															"type": "String"
+														}
+													},
+													{
+														"source": {
+															"name": "batchRowKey",
+															"type": "String"
+														},
+														"sink": {
+															"name": "RowKey",
+															"type": "String"
+														}
+													},
+													{
+														"source": {
+															"name": "Timestamp",
+															"type": "DateTimeOffset"
+														},
+														"sink": {
+															"name": "Timestamp",
+															"type": "DateTimeOffset"
+														}
+													},
+													{
+														"source": {
+															"name": "batchHighWaterMarkMax",
+															"type": "String"
+														},
+														"sink": {
+															"name": "HighWaterMarkMax",
+															"type": "DateTimeOffset"
+														}
+													},
+													{
+														"source": {
+															"name": "batchHighWaterMarkMin",
+															"type": "String"
+														},
+														"sink": {
+															"name": "HighWaterMarkMin",
+															"type": "String"
+														}
+													}
+												]
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "ds_sourcemeta_adls_table",
+												"type": "DatasetReference"
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "ds_batchparameter_adls_table",
+												"type": "DatasetReference"
+											}
+										]
+									}
+								]
+							}
+						},
+						{
+							"name": "lu-batchparameter-adlstable-batchid-hwmmax",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "If-hasrecord-batchid",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureTableSource",
+									"azureTableSourceQuery": {
+										"value": "PartitionKey eq '@{concat(item().PartitionKey,'-',item().RowKey)}' and RowKey eq '@{string(add(pipeline().parameters.pintBatchId,1))}'",
+										"type": "Expression"
+									},
+									"azureTableSourceIgnoreTableNotFound": false
+								},
+								"dataset": {
+									"referenceName": "ds_batchparameter_adls_table",
+									"type": "DatasetReference"
+								},
+								"firstRowOnly": true
+							}
+						},
+						{
+							"name": "If-hasrecord-batchid-hwmmax",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "lu-batchparameter-adlstable-batchid-hwmmax",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@contains(activity('lu-batchparameter-adlstable-batchid-hwmmax').output.firstRow,'HighWaterMarkMax')",
+									"type": "Expression"
+								},
+								"ifFalseActivities": [
+									{
+										"name": "cp-batchparameter-adls-table-nohwmmax",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "7.00:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "AzureTableSource",
+												"additionalColumns": [
+													{
+														"name": "batchPartitionKey",
+														"value": {
+															"value": "@concat(item().PartitionKey,'-',item().RowKey)",
+															"type": "Expression"
+														}
+													},
+													{
+														"name": "batchRowKey",
+														"value": {
+															"value": "@string(add(pipeline().parameters.pintBatchId,1))",
+															"type": "Expression"
+														}
+													},
+													{
+														"name": "batchHighWaterMarkMax",
+														"value": {
+															"value": "1900-01-01",
+															"type": "Expression"
+														}
+													},
+													{
+														"name": "batchHighWaterMarkMin",
+														"value": {
+															"value": "1900-01-01",
+															"type": "Expression"
+														}
+													}
+												],
+												"azureTableSourceQuery": {
+													"value": "PartitionKey eq '@{item().PartitionKey}' and RowKey eq '@{item().RowKey}'",
+													"type": "Expression"
+												},
+												"azureTableSourceIgnoreTableNotFound": false
+											},
+											"sink": {
+												"type": "AzureTableSink",
+												"azureTableInsertType": "merge",
+												"azureTablePartitionKeyName": {
+													"value": "PartitionKey",
+													"type": "Expression"
+												},
+												"azureTableRowKeyName": {
+													"value": "RowKey",
+													"type": "Expression"
+												},
+												"writeBatchSize": 10000
+											},
+											"enableStaging": false,
+											"translator": {
+												"type": "TabularTranslator",
+												"mappings": [
+													{
+														"source": {
+															"name": "batchPartitionKey",
+															"type": "String"
+														},
+														"sink": {
+															"name": "PartitionKey",
+															"type": "String"
+														}
+													},
+													{
+														"source": {
+															"name": "batchRowKey",
+															"type": "String"
+														},
+														"sink": {
+															"name": "RowKey",
+															"type": "String"
+														}
+													},
+													{
+														"source": {
+															"name": "Timestamp",
+															"type": "DateTimeOffset"
+														},
+														"sink": {
+															"name": "Timestamp",
+															"type": "DateTimeOffset"
+														}
+													},
+													{
+														"source": {
+															"name": "batchHighWaterMarkMax",
+															"type": "String"
+														},
+														"sink": {
+															"name": "HighWaterMarkMax",
+															"type": "DateTimeOffset"
+														}
+													},
+													{
+														"source": {
+															"name": "batchHighWaterMarkMin",
+															"type": "String"
+														},
+														"sink": {
+															"name": "HighWaterMarkMin",
+															"type": "String"
+														}
+													}
+												]
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "ds_sourcemeta_adls_table",
+												"type": "DatasetReference"
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "ds_batchparameter_adls_table",
+												"type": "DatasetReference"
+											}
+										]
+									}
+								]
+							}
+						},
+						{
+							"name": "lu-batchparameter-adlstable-hwm-update",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureTableSource",
+									"azureTableSourceQuery": {
+										"value": "PartitionKey eq '@{concat(item().PartitionKey,'-',item().RowKey)}' and RowKey eq '@{pipeline().parameters.pintBatchId}'\n\n",
+										"type": "Expression"
+									},
+									"azureTableSourceIgnoreTableNotFound": false
+								},
+								"dataset": {
+									"referenceName": "ds_batchparameter_adls_table",
+									"type": "DatasetReference"
+								},
+								"firstRowOnly": true
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"pintBatchId": {
+				"type": "int",
+				"defaultValue": 0
+			},
+			"pstrSourceMetaPartitionKey": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Extract/BSS/Dynamics"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-04-14T23:23:58Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

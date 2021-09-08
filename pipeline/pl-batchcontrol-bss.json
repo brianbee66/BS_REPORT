@@ -1,0 +1,1629 @@
+{
+	"name": "pl-batchcontrol-bss",
+	"properties": {
+		"activities": [
+			{
+				"name": "expl-extract-dynamics-creditors",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "lu-batchcontrol-adls-table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-extract-dynamics",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"pintBatchId": {
+							"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+							"type": "Expression"
+						},
+						"pstrSourceMetaPartitionKey": "Extract-BSS-Dynamics-Creditors"
+					}
+				}
+			},
+			{
+				"name": "expl-extract-dynamics-debtors",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "lu-batchcontrol-adls-table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-extract-dynamics",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"pintBatchId": {
+							"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+							"type": "Expression"
+						},
+						"pstrSourceMetaPartitionKey": "Extract-BSS-Dynamics-Debtors"
+					}
+				}
+			},
+			{
+				"name": "expl-extract-dynamics-money_advisers",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "lu-batchcontrol-adls-table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-extract-dynamics",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"pintBatchId": {
+							"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+							"type": "Expression"
+						},
+						"pstrSourceMetaPartitionKey": "Extract-BSS-Dynamics-Money_Advisers"
+					}
+				}
+			},
+			{
+				"name": "expl-extract-dynamics-moratoriums",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "lu-batchcontrol-adls-table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-extract-dynamics",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"pintBatchId": {
+							"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+							"type": "Expression"
+						},
+						"pstrSourceMetaPartitionKey": "Extract-BSS-Dynamics-Moratoriums"
+					}
+				}
+			},
+			{
+				"name": "expl-extract-dynamics-notifications",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "lu-batchcontrol-adls-table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-extract-dynamics",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"pintBatchId": {
+							"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+							"type": "Expression"
+						},
+						"pstrSourceMetaPartitionKey": "Extract-BSS-Dynamics-Notifications"
+					}
+				}
+			},
+			{
+				"name": "expl-extract-dynamics-references",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "lu-batchcontrol-adls-table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-extract-dynamics",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"pintBatchId": {
+							"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+							"type": "Expression"
+						},
+						"pstrSourceMetaPartitionKey": "Extract-BSS-Dynamics-References"
+					}
+				}
+			},
+			{
+				"name": "expl-extract-notify-notifications",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "lu-batchcontrol-adls-table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-extract-notify",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"pintBatchId": {
+							"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+							"type": "Expression"
+						},
+						"pstrSourceMetaPartitionKey": "Extract-BSS-Notify-Notifications"
+					}
+				}
+			},
+			{
+				"name": "lu-batchcontrol-adls-table",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-start",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceQuery": "PartitionKey eq 'BSS' and RowKey eq 'Reporting'",
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "ds_batchcontrol_adls_table",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "cp-batchcontrol-adls-table-extract",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "expl-extract-dynamics-creditors",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-extract-dynamics-debtors",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-extract-dynamics-money_advisers",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-extract-dynamics-moratoriums",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-extract-dynamics-notifications",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-extract-dynamics-references",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-extract-notify-notifications",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"additionalColumns": [
+							{
+								"name": "NewBatchId",
+								"value": {
+									"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+									"type": "Expression"
+								}
+							},
+							{
+								"name": "NewStatus",
+								"value": "100"
+							}
+						],
+						"azureTableSourceQuery": "PartitionKey eq 'BSS' and RowKey eq 'Reporting'",
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"sink": {
+						"type": "AzureTableSink",
+						"azureTableInsertType": "merge",
+						"azureTablePartitionKeyName": {
+							"value": "PartitionKey",
+							"type": "Expression"
+						},
+						"azureTableRowKeyName": {
+							"value": "RowKey",
+							"type": "Expression"
+						},
+						"writeBatchSize": 10000
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "PartitionKey",
+									"type": "String"
+								},
+								"sink": {
+									"name": "PartitionKey",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "RowKey",
+									"type": "String"
+								},
+								"sink": {
+									"name": "RowKey",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "NewBatchId",
+									"type": "String"
+								},
+								"sink": {
+									"name": "BatchId",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "NewStatus",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Status",
+									"type": "Int32"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_batchcontrol_adls_table",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_batchcontrol_adls_table",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "cp-batchcontrol-adls-table-start",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"additionalColumns": [
+							{
+								"name": "NewStatus",
+								"value": "10"
+							}
+						],
+						"azureTableSourceQuery": "PartitionKey eq 'BSS' and RowKey eq 'Reporting'",
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"sink": {
+						"type": "AzureTableSink",
+						"azureTableInsertType": "merge",
+						"azureTablePartitionKeyName": {
+							"value": "PartitionKey",
+							"type": "Expression"
+						},
+						"azureTableRowKeyName": {
+							"value": "RowKey",
+							"type": "Expression"
+						},
+						"writeBatchSize": 10000
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "PartitionKey",
+									"type": "String"
+								},
+								"sink": {
+									"name": "PartitionKey",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "RowKey",
+									"type": "String"
+								},
+								"sink": {
+									"name": "RowKey",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "NewStatus",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Status",
+									"type": "Int32"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_batchcontrol_adls_table",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_batchcontrol_adls_table",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "expl-curation-staging-partition-creditors",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-extract",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-curation-staging-partition",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"pintBatchId": {
+							"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+							"type": "Expression"
+						},
+						"pstrSourceMetaPartitionKey": "Extract-BSS-Dynamics-Creditors"
+					}
+				}
+			},
+			{
+				"name": "expl-curation-staging-partition-debtors",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-extract",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-curation-staging-partition",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"pintBatchId": {
+							"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+							"type": "Expression"
+						},
+						"pstrSourceMetaPartitionKey": "Extract-BSS-Dynamics-Debtors"
+					}
+				}
+			},
+			{
+				"name": "expl-curation-staging-partition-money_advisers",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-extract",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-curation-staging-partition",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"pintBatchId": {
+							"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+							"type": "Expression"
+						},
+						"pstrSourceMetaPartitionKey": "Extract-BSS-Dynamics-Money_Advisers"
+					}
+				}
+			},
+			{
+				"name": "expl-curation-staging-partition-moratoriums",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-extract",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-curation-staging-partition",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"pintBatchId": {
+							"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+							"type": "Expression"
+						},
+						"pstrSourceMetaPartitionKey": "Extract-BSS-Dynamics-Moratoriums"
+					}
+				}
+			},
+			{
+				"name": "expl-curation-staging-partition-notifications",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-extract",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-curation-staging-partition",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"pintBatchId": {
+							"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+							"type": "Expression"
+						},
+						"pstrSourceMetaPartitionKey": "Extract-BSS-Dynamics-Notifications"
+					}
+				}
+			},
+			{
+				"name": "expl-curation-staging-partition-references",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-extract",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-curation-staging-partition",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"pintBatchId": {
+							"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+							"type": "Expression"
+						},
+						"pstrSourceMetaPartitionKey": "Extract-BSS-Dynamics-References"
+					}
+				}
+			},
+			{
+				"name": "expl-curation-staging-partition-notify-notifications",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-extract",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-curation-staging-partition",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"pintBatchId": {
+							"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+							"type": "Expression"
+						},
+						"pstrSourceMetaPartitionKey": "Extract-BSS-Notify-Notifications"
+					}
+				}
+			},
+			{
+				"name": "cp-batchcontrol-adls-table-curation-staging",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "expl-curation-staging-partition-creditors",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-curation-staging-partition-debtors",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-curation-staging-partition-money_advisers",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-curation-staging-partition-moratoriums",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-curation-staging-partition-notifications",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-curation-staging-partition-references",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-curation-staging-partition-notify-notifications",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-curation-staging-partition-external-references",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"additionalColumns": [
+							{
+								"name": "NewBatchId",
+								"value": {
+									"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+									"type": "Expression"
+								}
+							},
+							{
+								"name": "NewStatus",
+								"value": "200"
+							}
+						],
+						"azureTableSourceQuery": "PartitionKey eq 'BSS' and RowKey eq 'Reporting'",
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"sink": {
+						"type": "AzureTableSink",
+						"azureTableInsertType": "merge",
+						"azureTablePartitionKeyName": {
+							"value": "PartitionKey",
+							"type": "Expression"
+						},
+						"azureTableRowKeyName": {
+							"value": "RowKey",
+							"type": "Expression"
+						},
+						"writeBatchSize": 10000
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "PartitionKey",
+									"type": "String"
+								},
+								"sink": {
+									"name": "PartitionKey",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "RowKey",
+									"type": "String"
+								},
+								"sink": {
+									"name": "RowKey",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "NewBatchId",
+									"type": "String"
+								},
+								"sink": {
+									"name": "BatchId",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "NewStatus",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Status",
+									"type": "Int32"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_batchcontrol_adls_table",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_batchcontrol_adls_table",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "expl-curation-staging-partition-external-references",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-extract",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-curation-staging-partition",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"pintBatchId": {
+							"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+							"type": "Expression"
+						},
+						"pstrSourceMetaPartitionKey": "Stage-BSS-External-References"
+					}
+				}
+			},
+			{
+				"name": "expl-curation-validation-creditors",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-curation-staging",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-curation-validation-creditors",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "expl-curation-validation-debtors",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-curation-staging",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-curation-validation-debtors",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "expl-curation-validation-money_advisers",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-curation-staging",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-curation-validation-money_advisers",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "expl-curation-validation-moratoriums",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-curation-staging",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-curation-validation-moratoriums",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "expl-curation-validation-notifications",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-curation-staging",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-curation-validation-notifications",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "expl-curation-validation-references-bss",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-curation-staging",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-curation-validation-references-bss",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "cp-batchcontrol-adls-table-curation-validation",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "expl-curation-validation-creditors",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-curation-validation-debtors",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-curation-validation-money_advisers",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-curation-validation-moratoriums",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-curation-validation-notifications",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-curation-validation-references-bss",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"additionalColumns": [
+							{
+								"name": "NewBatchId",
+								"value": {
+									"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+									"type": "Expression"
+								}
+							},
+							{
+								"name": "NewStatus",
+								"value": "300"
+							}
+						],
+						"azureTableSourceQuery": "PartitionKey eq 'BSS' and RowKey eq 'Reporting'",
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"sink": {
+						"type": "AzureTableSink",
+						"azureTableInsertType": "merge",
+						"azureTablePartitionKeyName": {
+							"value": "PartitionKey",
+							"type": "Expression"
+						},
+						"azureTableRowKeyName": {
+							"value": "RowKey",
+							"type": "Expression"
+						},
+						"writeBatchSize": 10000
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "PartitionKey",
+									"type": "String"
+								},
+								"sink": {
+									"name": "PartitionKey",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "RowKey",
+									"type": "String"
+								},
+								"sink": {
+									"name": "RowKey",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "NewBatchId",
+									"type": "String"
+								},
+								"sink": {
+									"name": "BatchId",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "NewStatus",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Status",
+									"type": "Int32"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_batchcontrol_adls_table",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_batchcontrol_adls_table",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "expl-curation-preparation-creditors",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-curation-validation",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-curation-preparation-creditors",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "expl-curation-preparation-debtors",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-curation-validation",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-curation-preparation-debtors",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "expl-curation-preparation-money_advisers",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-curation-validation",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-curation-preparation-money_advisers",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "expl-curation-preparation-moratoriums",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-curation-validation",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-curation-preparation-moratoriums",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "expl-curation-preparation-notifications",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-curation-validation",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-curation-preparation-notifications",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "expl-curation-preparation-references-bss",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-curation-validation",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-curation-preparation-references-bss",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "cp-batchcontrol-adls-table-curation-preparation",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "expl-curation-preparation-creditors",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-curation-preparation-debtors",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-curation-preparation-money_advisers",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-curation-preparation-moratoriums",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-curation-preparation-notifications",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "expl-curation-preparation-references-bss",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"additionalColumns": [
+							{
+								"name": "NewBatchId",
+								"value": {
+									"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+									"type": "Expression"
+								}
+							},
+							{
+								"name": "NewStatus",
+								"value": "400"
+							}
+						],
+						"azureTableSourceQuery": "PartitionKey eq 'BSS' and RowKey eq 'Reporting'",
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"sink": {
+						"type": "AzureTableSink",
+						"azureTableInsertType": "merge",
+						"azureTablePartitionKeyName": {
+							"value": "PartitionKey",
+							"type": "Expression"
+						},
+						"azureTableRowKeyName": {
+							"value": "RowKey",
+							"type": "Expression"
+						},
+						"writeBatchSize": 10000
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "PartitionKey",
+									"type": "String"
+								},
+								"sink": {
+									"name": "PartitionKey",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "RowKey",
+									"type": "String"
+								},
+								"sink": {
+									"name": "RowKey",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "NewBatchId",
+									"type": "String"
+								},
+								"sink": {
+									"name": "BatchId",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "NewStatus",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Status",
+									"type": "Int32"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_batchcontrol_adls_table",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_batchcontrol_adls_table",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "expl-load-sql-set1",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "cp-batchcontrol-adls-table-curation-preparation",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-load-sql_set1",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"pintBatchId": {
+							"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "expl-load-sql-set2",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "expl-load-sql-set1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-load-sql_set2",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"pintBatchId": {
+							"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "expl-load-sql-set3",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "expl-load-sql-set2",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-load-sql_set3",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"pintBatchId": {
+							"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "expl-load-sql-set4",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "expl-load-sql-set3",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-load-sql_set4",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"pintBatchId": {
+							"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "expl-load-sql-set5",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "expl-load-sql-set4",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-load-sql_set5",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"pintBatchId": {
+							"value": "@activity('lu-batchcontrol-adls-table').output.firstRow.BatchId",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "cp-batchcontrol-adls-table-load",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "expl-load-sql-set5",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"additionalColumns": [
+							{
+								"name": "NewBatchId",
+								"value": {
+									"value": "@string(add(activity('lu-batchcontrol-adls-table').output.firstRow.BatchId,1))",
+									"type": "Expression"
+								}
+							},
+							{
+								"name": "NewStatus",
+								"value": "500"
+							}
+						],
+						"azureTableSourceQuery": "PartitionKey eq 'BSS' and RowKey eq 'Reporting'",
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"sink": {
+						"type": "AzureTableSink",
+						"azureTableInsertType": "merge",
+						"azureTablePartitionKeyName": {
+							"value": "PartitionKey",
+							"type": "Expression"
+						},
+						"azureTableRowKeyName": {
+							"value": "RowKey",
+							"type": "Expression"
+						},
+						"writeBatchSize": 10000
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "PartitionKey",
+									"type": "String"
+								},
+								"sink": {
+									"name": "PartitionKey",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "RowKey",
+									"type": "String"
+								},
+								"sink": {
+									"name": "RowKey",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "NewBatchId",
+									"type": "String"
+								},
+								"sink": {
+									"name": "BatchId",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "NewStatus",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Status",
+									"type": "Int32"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_batchcontrol_adls_table",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_batchcontrol_adls_table",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "Control/BSS"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-04-14T23:24:05Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

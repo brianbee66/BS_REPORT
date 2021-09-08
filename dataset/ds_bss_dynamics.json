@@ -1,0 +1,16 @@
+{
+	"name": "ds_bss_dynamics",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_inssbss_dynamics",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "BSS/Dynamics"
+		},
+		"annotations": [],
+		"type": "DynamicsEntity",
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

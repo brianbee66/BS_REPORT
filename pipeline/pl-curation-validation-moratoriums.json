@@ -1,0 +1,251 @@
+{
+	"name": "pl-curation-validation-moratoriums",
+	"properties": {
+		"activities": [
+			{
+				"name": "df_curation_validation_breathingspacesdebt",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_validation_breathingspacedebt",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceStaging": {
+								"filePath": "staging/bss/dynamics/moratoriums/ntt_breathingspacedebt.csv",
+								"fileSystem": "curation"
+							},
+							"sinkValidation": {
+								"filePath": "validation/bss/dynamics/moratoriums/ntt_breathingspacedebt.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "df_curation_validation_breathingspacesmoratorium",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_validation_breathingspacemoratorium",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceStaging": {
+								"filePath": "staging/bss/dynamics/moratoriums/ntt_breathingspacemoratorium.csv",
+								"fileSystem": "curation"
+							},
+							"sinkValidation": {
+								"filePath": "validation/bss/dynamics/moratoriums/ntt_breathingspacemoratorium.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "df_curation_validation_debteligibilityreview",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_validation_debteligibilityreview",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceStaging": {
+								"filePath": "staging/bss/dynamics/moratoriums/ntt_debteligibilityreview.csv",
+								"fileSystem": "curation"
+							},
+							"sinkValidation": {
+								"filePath": "validation/bss/dynamics/moratoriums/ntt_debteligibilityreview.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "df_curation_validation_debteligibilityreviewtype",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_validation_debteligibilityreviewtype",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceStaging": {
+								"filePath": "staging/bss/dynamics/moratoriums/ntt_debteligibilityreviewtype.csv",
+								"fileSystem": "curation"
+							},
+							"sinkValidation": {
+								"filePath": "validation/bss/dynamics/moratoriums/ntt_debteligibilityreviewtype.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "df_curation_validation_debteligibilitystatustype",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_validation_debteligibilitystatustype",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceStaging": {
+								"filePath": "staging/bss/dynamics/moratoriums/ntt_debteligibilitystatustype.csv",
+								"fileSystem": "curation"
+							},
+							"sinkValidation": {
+								"filePath": "validation/bss/dynamics/moratoriums/ntt_debteligibilitystatustype.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "df_curation_validation_moratoriumchildcancellation",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_validation_moratoriumchildcancellationreason",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceStaging": {
+								"filePath": "staging/bss/dynamics/moratoriums/ntt_moratoriumchildcancellationreason.csv",
+								"fileSystem": "curation"
+							},
+							"sinkValidation": {
+								"filePath": "validation/bss/dynamics/moratoriums/ntt_moratoriumchildcancellationreason.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "df_curation_validation_moratoriumparentcancellation",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_validation_moratoriumparentcancellationreason",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceStaging": {
+								"filePath": "staging/bss/dynamics/moratoriums/ntt_moratoriumparentcancellationreason.csv",
+								"fileSystem": "curation"
+							},
+							"sinkValidation": {
+								"filePath": "validation/bss/dynamics/moratoriums/ntt_moratoriumparentcancellationreason.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Transform/BSS/Validation"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-04-14T23:24:02Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

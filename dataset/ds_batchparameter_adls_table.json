@@ -1,0 +1,19 @@
+{
+	"name": "ds_batchparameter_adls_table",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls-sourcemeta-adls-table",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "BSS/ADLS"
+		},
+		"annotations": [],
+		"type": "AzureTable",
+		"schema": [],
+		"typeProperties": {
+			"tableName": "batchparameter"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

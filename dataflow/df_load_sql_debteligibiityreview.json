@@ -1,0 +1,70 @@
+{
+	"name": "df_load_sql_debteligibiityreview",
+	"properties": {
+		"folder": {
+			"name": "Load/BSS"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_reporting_adls",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sourceODS"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_reporting_lookup_mssql",
+						"type": "DatasetReference"
+					},
+					"name": "sourceSQLLookupDebtErstFk"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_reporting_lookup_mssql",
+						"type": "DatasetReference"
+					},
+					"name": "sourceSQLLookupBsDebtFk"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_reporting_mssql",
+						"type": "DatasetReference"
+					},
+					"name": "sinkSQL"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectODS"
+				},
+				{
+					"name": "dcolSQL"
+				},
+				{
+					"name": "JoinSQLLookupDebtErstFk"
+				},
+				{
+					"name": "AlterRowSQL"
+				},
+				{
+					"name": "SelectSQLLookupDebtErstFk"
+				},
+				{
+					"name": "FilterODS"
+				},
+				{
+					"name": "SelectSQLLookupBsDebtFk"
+				},
+				{
+					"name": "JoinSQLLookupBsDebtFk"
+				}
+			],
+			"script": "parameters{\n\tpartdistFrom as string\n}\nsource(output(\n\t\towningbusinessunit as string,\n\t\tntt_name as string,\n\t\tstatecode as string,\n\t\tstatuscode as string,\n\t\tntt_debteligibilityreviewid as string,\n\t\tcreatedby as string,\n\t\tntt_eligibilitystatusid as string,\n\t\tntt_debteligibilityreviewtypeid as string,\n\t\tntt_creditornotes as string,\n\t\townerid as string,\n\t\tmodifiedon as string,\n\t\tntt_debtid as string,\n\t\towninguser as string,\n\t\tmodifiedby as string,\n\t\tcreatedon as string,\n\t\tntt_courtdecisionnotes as string,\n\t\tntt_moneyadvisernotes as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date,\n\t\tblIsValid as boolean,\n\t\ttsCreatedOn as timestamp,\n\t\ttsModifiedOn as timestamp,\n\t\tstrNTTDebtEligibilityReviewId as string,\n\t\tstrNTTDebtId as string,\n\t\tstrNTTEligibilityStatusId as string,\n\t\tblIsTruncate as boolean\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'delta',\n\tfileSystem: 'curation',\n\tfolderPath: 'ods/bss/dynamics/moratoriums/debteligibilityreview') ~> sourceODS\nsource(output(\n\t\tdebt_erst_pk_skey as integer,\n\t\tntt_name as string,\n\t\tntt_debteligibilitystatustypeid as string,\n\t\tisValid as boolean,\n\t\tisTruncate as boolean,\n\t\tbatch_id as integer,\n\t\tcreatedon as timestamp,\n\t\tmodifiedon as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> sourceSQLLookupDebtErstFk\nsource(output(\n\t\tbs_debt_pk_skey as integer,\n\t\tbsm_fk as integer,\n\t\tntt_creditorid_fk as integer,\n\t\tbs_debt_type_fk as integer,\n\t\tntt_breathingspacedebtid as string,\n\t\tntt_breathingspacemoratoriumid as integer,\n\t\tntt_activeregister as boolean,\n\t\tntt_commencementdate as timestamp,\n\t\tisValid as boolean,\n\t\tisTruncate as boolean,\n\t\tbatch_id as integer,\n\t\tntt_debttypeid as string,\n\t\tntt_activeregisterperiodstartdate as timestamp,\n\t\tntt_removedfromregisterdate as timestamp,\n\t\tntt_amount as decimal(19,4),\n\t\tcreatedon as timestamp,\n\t\tmodifiedon as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> sourceSQLLookupBsDebtFk\nJoinSQLLookupBsDebtFk select(mapColumn(\n\t\tbatch_id = intBatchId,\n\t\tisValid = blIsValid,\n\t\tcreatedon = tsCreatedOn,\n\t\tmodifiedon = tsModifiedOn,\n\t\tntt_debteligibilityreviewid = strNTTDebtEligibilityReviewId,\n\t\tisTruncate = blIsTruncate,\n\t\tdebt_erst_fk = debt_erst_pk_skey,\n\t\tbs_debt_fk = bs_debt_pk_skey\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectODS\nSelectODS derive(ntt_debteligibilityreviewid = coalesce(ntt_debteligibilityreviewid, 'unknown'),\n\t\tcreatedon_dimdate_fk = iif(createdon == toTimestamp('1900-01-01 00:00:00'), -1, toInteger(toString(createdon, 'yyyyMMdd'))),\n\t\tmodifiedon_dimdate_fk = iif(modifiedon == toTimestamp('1900-01-01 00:00:00'), -1, toInteger(toString(modifiedon, 'yyyyMMdd')))) ~> dcolSQL\nFilterODS, SelectSQLLookupDebtErstFk join(strNTTEligibilityStatusId == ntt_debteligibilitystatustypeid,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinSQLLookupDebtErstFk\ndcolSQL alterRow(upsertIf(true())) ~> AlterRowSQL\nsourceSQLLookupDebtErstFk select(mapColumn(\n\t\tdebt_erst_pk_skey,\n\t\tntt_debteligibilitystatustypeid\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSQLLookupDebtErstFk\nsourceODS filter(partdist >= toDate($partdistFrom)) ~> FilterODS\nsourceSQLLookupBsDebtFk select(mapColumn(\n\t\tbs_debt_pk_skey,\n\t\tntt_breathingspacedebtid\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSQLLookupBsDebtFk\nJoinSQLLookupDebtErstFk, SelectSQLLookupBsDebtFk join(strNTTDebtId == ntt_breathingspacedebtid,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinSQLLookupBsDebtFk\nAlterRowSQL sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['ntt_debteligibilityreviewid'],\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sinkSQL"
+		}
+	}
+}

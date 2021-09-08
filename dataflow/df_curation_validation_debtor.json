@@ -1,0 +1,47 @@
+{
+	"name": "df_curation_validation_debtor",
+	"properties": {
+		"folder": {
+			"name": "Transform/BSS/Debtors"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceStaging"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sinkValidation"
+				}
+			],
+			"transformations": [
+				{
+					"name": "decolTypeConvertion"
+				},
+				{
+					"name": "dcolIsValid"
+				},
+				{
+					"name": "dcolMandatoryValue"
+				},
+				{
+					"name": "dcolIsTruncate"
+				},
+				{
+					"name": "dcolMandatoryTruncate"
+				}
+			],
+			"script": "source(output(\n\t\tstatecode as string,\n\t\tntt_activeregister as string,\n\t\tstatuscode as string,\n\t\tntt_addresswithheld as string,\n\t\tcreatedon as string,\n\t\tntt_mobiletelephone as string,\n\t\tntt_reference as string,\n\t\tntt_breathingspacedebtorid as string,\n\t\townerid as string,\n\t\tmodifiedon as string,\n\t\tntt_telephone as string,\n\t\tntt_lastname as string,\n\t\ttimezoneruleversionnumber as string,\n\t\tmodifiedby as string,\n\t\tntt_email as string,\n\t\tntt_dateofbirth as string,\n\t\tcreatedby as string,\n\t\towningbusinessunit as string,\n\t\tntt_middlename as string,\n\t\tntt_name as string,\n\t\towninguser as string,\n\t\tntt_firstname as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceStaging\nsourceStaging derive(tsCreatedOn = toTimestamp(createdon),\n\t\ttsModifiedOn = toTimestamp(modifiedon),\n\t\ttsNTTDateOfBirth = toTimestamp(ntt_dateofbirth),\n\t\tstrNTTBreathingSpaceDebtorId = toString(ntt_breathingspacedebtorid),\n\t\tblNTTAddressWithheld = toBoolean(ntt_addresswithheld)) ~> decolTypeConvertion\ndecolTypeConvertion derive(blIsValid = iif(isNull(tsCreatedOn) || isNull(tsModifiedOn) || isNull(tsNTTDateOfBirth) || isNull(strNTTBreathingSpaceDebtorId) || isNull(blNTTAddressWithheld) || tsNTTDateOfBirth > tsModifiedOn || tsNTTDateOfBirth < toTimestamp('1830-01-01 00:00:00'), toBoolean('0'), toBoolean('1'))) ~> dcolIsValid\ndcolIsValid derive(tsCreatedOn = coalesce(tsCreatedOn, toTimestamp('1900-01-01 00:00:00')),\n\t\ttsModifiedOn = coalesce(tsModifiedOn, toTimestamp('1900-01-01 00:00:00')),\n\t\ttsNTTDateOfBirth = coalesce(tsNTTDateOfBirth, toTimestamp('1900-01-01 00:00:00')),\n\t\tstrNTTBreathingSpaceDebtorId = coalesce(strNTTBreathingSpaceDebtorId,'missing'),\n\t\tblNTTAddressWithheld = coalesce(blNTTAddressWithheld, toBoolean('false'))) ~> dcolMandatoryValue\ndcolMandatoryValue derive(blIsTruncate = iif(length(strNTTBreathingSpaceDebtorId) > 36, toBoolean('1'), toBoolean('0'))) ~> dcolIsTruncate\ndcolIsTruncate derive(strNTTBreathingSpaceDebtorId = left(strNTTBreathingSpaceDebtorId, 36)) ~> dcolMandatoryTruncate\ndcolMandatoryTruncate sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\ttruncate: true,\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sinkValidation"
+		}
+	}
+}

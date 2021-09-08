@@ -1,0 +1,51 @@
+{
+	"name": "df_curation_preparation_moratoriumcancellationreason",
+	"properties": {
+		"folder": {
+			"name": "Transform/BSS/Moratoriums"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceValidationChildCancellationReason"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceValidationParentCancellationReason"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_reporting_adls",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkCancellationReason"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectChildCalcellationReason"
+				},
+				{
+					"name": "SelectParentCancellationReason"
+				},
+				{
+					"name": "UnionCancellationReason"
+				},
+				{
+					"name": "AlterRowCancellationReason"
+				}
+			],
+			"script": "source(output(\n\t\torganizationid as string,\n\t\tntt_identifier as string,\n\t\tntt_name as string,\n\t\tstatecode as string,\n\t\tstatuscode as string,\n\t\timportsequencenumber as string,\n\t\tntt_moratoriumchildcancellationreasonid as string,\n\t\tcreatedby as string,\n\t\tntt_parentcancellationreasonid as string,\n\t\tmodifiedon as string,\n\t\tmodifiedby as string,\n\t\tcreatedon as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date,\n\t\tblIsValid as boolean,\n\t\ttsCreatedOn as timestamp,\n\t\ttsModifiedOn as timestamp,\n\t\tstrNTTMoratoriumChildCancellationReasonId as string,\n\t\tstrNTTName as string,\n\t\tblIsTruncate as boolean\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceValidationChildCancellationReason\nsource(output(\n\t\tntt_applicabletostandardmoratorium as string,\n\t\torganizationid as string,\n\t\tmodifiedon as string,\n\t\tntt_name as string,\n\t\tstatecode as string,\n\t\tstatuscode as string,\n\t\timportsequencenumber as string,\n\t\tcreatedby as string,\n\t\tntt_applicabletomentalhealthmoratorium as string,\n\t\tntt_moratoriumparentcancellationreasonid as string,\n\t\tntt_midwayreviewquestion as string,\n\t\tmodifiedby as string,\n\t\tntt_identifier as string,\n\t\tcreatedon as string,\n\t\tntt_mentalhealthreviewquestion as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date,\n\t\tblIsValid as boolean,\n\t\ttsCreatedOn as timestamp,\n\t\ttsModifiedOn as timestamp,\n\t\tstrNTTMoratoriumParentCancellationReasonId as string,\n\t\tstrNTTName as string,\n\t\tblIsTruncate as boolean\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceValidationParentCancellationReason\nsourceValidationChildCancellationReason select(mapColumn(\n\t\torganizationid,\n\t\tntt_identifier,\n\t\tntt_name,\n\t\tstatecode,\n\t\tstatuscode,\n\t\timportsequencenumber,\n\t\tntt_moratoriumcancellationreasonid = ntt_moratoriumchildcancellationreasonid,\n\t\tcreatedby,\n\t\tmodifiedon,\n\t\tmodifiedby,\n\t\tcreatedon,\n\t\tintBatchId,\n\t\tpartdist,\n\t\tblIsValid,\n\t\ttsCreatedOn,\n\t\ttsModifiedOn,\n\t\tstrNTTMoratoriumCancellationReasonId = strNTTMoratoriumChildCancellationReasonId,\n\t\tstrNTTName,\n\t\tblIsTruncate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectChildCalcellationReason\nsourceValidationParentCancellationReason select(mapColumn(\n\t\torganizationid,\n\t\tmodifiedon,\n\t\tntt_name,\n\t\tstatecode,\n\t\tstatuscode,\n\t\timportsequencenumber,\n\t\tcreatedby,\n\t\tntt_moratoriumcancellationreasonid = ntt_moratoriumparentcancellationreasonid,\n\t\tmodifiedby,\n\t\tntt_identifier,\n\t\tcreatedon,\n\t\tintBatchId,\n\t\tpartdist,\n\t\tblIsValid,\n\t\ttsCreatedOn,\n\t\ttsModifiedOn,\n\t\tstrNTTMoratoriumCancellationReasonId = strNTTMoratoriumParentCancellationReasonId,\n\t\tstrNTTName,\n\t\tblIsTruncate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectParentCancellationReason\nSelectChildCalcellationReason, SelectParentCancellationReason union(byName: true)~> UnionCancellationReason\nUnionCancellationReason alterRow(upsertIf(true())) ~> AlterRowCancellationReason\nAlterRowCancellationReason sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'delta',\n\tfileSystem: 'curation',\n\tfolderPath: 'ods/bss/dynamics/moratoriums/moratoriumcancellationreason',\n\tmergeSchema: false,\n\tautoCompact: false,\n\toptimizedWrite: false,\n\tvacuum: 0,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['strNTTMoratoriumCancellationReasonId'],\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('key',\n\t\t0,\n\t\tpartdist\n\t)) ~> sinkCancellationReason"
+		}
+	}
+}

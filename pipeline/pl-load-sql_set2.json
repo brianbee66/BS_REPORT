@@ -1,0 +1,522 @@
+{
+	"name": "pl-load-sql_set2",
+	"properties": {
+		"activities": [
+			{
+				"name": "df_load_sql_breathingspacestatustype",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "lu-hwm-ntt_breathingspacestatustype",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_load_sql_breathingspacestatustype",
+						"type": "DataFlowReference",
+						"parameters": {
+							"partdistFrom": {
+								"value": "'@{activity('lu-hwm-ntt_breathingspacestatustype').output.firstRow.HighWaterMarkMax}'",
+								"type": "Expression"
+							}
+						},
+						"datasetParameters": {
+							"sinkSQL": {
+								"table": "BREATHING_SPACE_STATUS_TYPE",
+								"schema": "ERBSSS001"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "lu-hwm-ntt_breathingspacestatustype",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceQuery": {
+							"value": "PartitionKey eq 'Extract-BSS-Dynamics-References-ntt_breathingspacestatustype' and RowKey eq '@{pipeline().parameters.pintBatchId}'",
+							"type": "Expression"
+						},
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "ds_batchparameter_adls_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "df_load_sql_breathingspacedebttype",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "lu-hwm-inss_debttype",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_load_sql_breathingspacedebttype",
+						"type": "DataFlowReference",
+						"parameters": {
+							"partdistFrom": {
+								"value": "'@{activity('lu-hwm-inss_debttype').output.firstRow.HighWaterMarkMax}'",
+								"type": "Expression"
+							}
+						},
+						"datasetParameters": {
+							"sinkSQL": {
+								"table": "BREATHING_SPACE_DEBT_TYPE",
+								"schema": "ERBSSS001"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "lu-hwm-inss_debttype",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceQuery": {
+							"value": "PartitionKey eq 'Extract-BSS-Dynamics-References-inss_debttype' and RowKey eq '@{pipeline().parameters.pintBatchId}'",
+							"type": "Expression"
+						},
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "ds_batchparameter_adls_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "df_load_sql_debteligibilityreviewstatustype",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "lu-hwm-ntt_debteligibilitystatustype",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_load_sql_debteligibilityreviewstatustype",
+						"type": "DataFlowReference",
+						"parameters": {
+							"partdistFrom": {
+								"value": "'@{activity('lu-hwm-ntt_debteligibilitystatustype').output.firstRow.HighWaterMarkMax}'",
+								"type": "Expression"
+							}
+						},
+						"datasetParameters": {
+							"sinkSQL": {
+								"table": "DEBT_ELIGIBILITY_REVIEW_STATUS_TYPE",
+								"schema": "ERBSSS001"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "lu-hwm-ntt_debteligibilitystatustype",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceQuery": {
+							"value": "PartitionKey eq 'Extract-BSS-Dynamics-Moratoriums-ntt_debteligibilitystatustype' and RowKey eq '@{pipeline().parameters.pintBatchId}'",
+							"type": "Expression"
+						},
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "ds_batchparameter_adls_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "df_load_sql_debtoreligibilityreviewstatustype",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "lu-hwm-ntt_debtoreligibilitystatustype",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_load_sql_debtoreligibilityreviewstatustype",
+						"type": "DataFlowReference",
+						"parameters": {
+							"partdistFrom": {
+								"value": "'@{activity('lu-hwm-ntt_debtoreligibilitystatustype').output.firstRow.HighWaterMarkMax}'",
+								"type": "Expression"
+							}
+						},
+						"datasetParameters": {
+							"sinkSQL": {
+								"table": "DEBTOR_ELIGIBILITY_REVIEW_STATUS_TYPE",
+								"schema": "ERBSSS001"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "lu-hwm-ntt_debtoreligibilitystatustype",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceQuery": {
+							"value": "PartitionKey eq 'Extract-BSS-Dynamics-Debtors-ntt_debtoreligibilitystatustype' and RowKey eq '@{pipeline().parameters.pintBatchId}'",
+							"type": "Expression"
+						},
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "ds_batchparameter_adls_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "df_load_sql_dynnotificationletterstatus",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "lu-hwm-ntt_notificationletterstatus",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_load_sql_dynnotificationletterstatus",
+						"type": "DataFlowReference",
+						"parameters": {
+							"partdistFrom": {
+								"value": "'@{activity('lu-hwm-ntt_notificationletterstatus').output.firstRow.HighWaterMarkMax}'",
+								"type": "Expression"
+							}
+						},
+						"datasetParameters": {
+							"sinkSQL": {
+								"table": "DYN_NOTIFICATION_LETTER_STATUS",
+								"schema": "ERBSSS001"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "lu-hwm-ntt_notificationletterstatus",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceQuery": {
+							"value": "PartitionKey eq 'Extract-BSS-Dynamics-Notifications-ntt_notificationletterstatus' and RowKey eq '@{pipeline().parameters.pintBatchId}'",
+							"type": "Expression"
+						},
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "ds_batchparameter_adls_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "df_load_sql_dynnotificationemailstatus",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "lu-hwm-ntt_notificationemailstatus",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_load_sql_dynnotificationemailstatus",
+						"type": "DataFlowReference",
+						"parameters": {
+							"partdistFrom": {
+								"value": "'@{activity('lu-hwm-ntt_notificationemailstatus').output.firstRow.HighWaterMarkMax}'",
+								"type": "Expression"
+							}
+						},
+						"datasetParameters": {
+							"sinkSQL": {
+								"table": "DYN_NOTIFICATION_EMAIL_STATUS",
+								"schema": "ERBSSS001"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "lu-hwm-ntt_notificationemailstatus",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceQuery": {
+							"value": "PartitionKey eq 'Extract-BSS-Dynamics-Notifications-ntt_notificationemailstatus' and RowKey eq '@{pipeline().parameters.pintBatchId}'",
+							"type": "Expression"
+						},
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "ds_batchparameter_adls_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "df_load_sql_dynnotificationtemplate",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "lu-hwm-ntt_notificationtemplate",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_load_sql_dynnotificationtemplate",
+						"type": "DataFlowReference",
+						"parameters": {
+							"partdistFrom": {
+								"value": "'@{activity('lu-hwm-ntt_notificationtemplate').output.firstRow.HighWaterMarkMax}'",
+								"type": "Expression"
+							}
+						},
+						"datasetParameters": {
+							"sinkSQL": {
+								"table": "DYN_NOTIFICATION_TEMPLATE",
+								"schema": "ERBSSS001"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "lu-hwm-ntt_notificationtemplate",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceQuery": {
+							"value": "PartitionKey eq 'Extract-BSS-Dynamics-Notifications-ntt_notificationtemplate' and RowKey eq '@{pipeline().parameters.pintBatchId}'",
+							"type": "Expression"
+						},
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "ds_batchparameter_adls_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			}
+		],
+		"parameters": {
+			"pintBatchId": {
+				"type": "int",
+				"defaultValue": 0
+			}
+		},
+		"variables": {
+			"pstrPartDistFrom": {
+				"type": "String",
+				"defaultValue": "1900-01-01"
+			}
+		},
+		"folder": {
+			"name": "Load/BSS"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-04-14T23:24:00Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

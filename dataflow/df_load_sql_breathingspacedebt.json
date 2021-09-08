@@ -1,0 +1,83 @@
+{
+	"name": "df_load_sql_breathingspacedebt",
+	"properties": {
+		"folder": {
+			"name": "Load/BSS"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_reporting_adls",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sourceODS"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_reporting_lookup_mssql",
+						"type": "DatasetReference"
+					},
+					"name": "sourceSQLLookupBsmFk"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_reporting_lookup_mssql",
+						"type": "DatasetReference"
+					},
+					"name": "sourceSQLLookupNttCreditorIdFk"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_reporting_lookup_mssql",
+						"type": "DatasetReference"
+					},
+					"name": "sourceSQLLookupBsDebtTypeFk"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_reporting_mssql",
+						"type": "DatasetReference"
+					},
+					"name": "sinkSQL"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectODS"
+				},
+				{
+					"name": "dcolSQL"
+				},
+				{
+					"name": "JoinSQLLookupBsmFk"
+				},
+				{
+					"name": "AlterRowSQL"
+				},
+				{
+					"name": "SelectSQLLookupBsmFk"
+				},
+				{
+					"name": "FilterODS"
+				},
+				{
+					"name": "SelectSQLLookupNttCreditorIdFk"
+				},
+				{
+					"name": "SelectSQLLookupBsDebtTypeFk"
+				},
+				{
+					"name": "JoinSQLLookupNttCreditorIdFk"
+				},
+				{
+					"name": "JoinSQLLookupBsDebtTypeFk"
+				}
+			],
+			"script": "parameters{\n\tpartdistFrom as string\n}\nsource(output(\n\t\tstatecode as string,\n\t\tntt_referencenumber as string,\n\t\tcreatedon as string,\n\t\tntt_triggercreditorsubmitnotification as string,\n\t\tntt_creditorexternalreferenceid as string,\n\t\townerid as string,\n\t\tmodifiedon as string,\n\t\tntt_triggernotification as string,\n\t\tntt_debttypeid as string,\n\t\ttransactioncurrencyid as string,\n\t\tntt_activeregister as string,\n\t\texchangerate as string,\n\t\tmodifiedby as string,\n\t\tntt_amount_base as string,\n\t\tstatuscode as string,\n\t\towningbusinessunit as string,\n\t\tntt_breathingspacedebtid as string,\n\t\tntt_triggercreditorexpirynotification as string,\n\t\tntt_amount as string,\n\t\tcreatedby as string,\n\t\tntt_debtstatusid as string,\n\t\tntt_creditorid as string,\n\t\tntt_breathingspacemoratoriumid as string,\n\t\tntt_name as string,\n\t\towninguser as string,\n\t\tntt_nationalinsurancenumber as string,\n\t\tmodifiedonbehalfby as string,\n\t\tntt_commencementdate as string,\n\t\ttimezoneruleversionnumber as string,\n\t\tntt_expirydate as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date,\n\t\tntt_previouslysold as string,\n\t\tntt_otherdebttype as string,\n\t\tntt_retentionperiodenddate as string,\n\t\tntt_retentionperiodstartdate as string,\n\t\tntt_activeregisterperiodstartdate as string,\n\t\tntt_activeregisterperiodenddate as string,\n\t\tblIsValid as boolean,\n\t\ttsCreatedOn as timestamp,\n\t\ttsModifiedOn as timestamp,\n\t\tstrNTTBreathingSpaceDebtId as string,\n\t\tblNTTActiveRegister as boolean,\n\t\tdcNTTAmount as decimal(38,4),\n\t\tstrNTTBreathingSpaceMoratoriumId as string,\n\t\tstrNTTCreditorId as string,\n\t\tstrNTTDebtTypeId as string,\n\t\ttsNTTCommencementDate as timestamp,\n\t\ttsNTTActiveRegisterPeriodStartDate as timestamp,\n\t\ttsNTTRemovedFromRegisterDate as timestamp,\n\t\tblIsTruncate as boolean,\n\t\tsteNTTCreditorId as string,\n\t\tntt_removedfromregisterdate as string,\n\t\tntt_removaldate as string,\n\t\ttsNTTRemovalDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'delta',\n\tfileSystem: 'curation',\n\tfolderPath: 'ods/bss/dynamics/moratoriums/breathingspacedebt') ~> sourceODS\nsource(output(\n\t\tbsm_pk_skey as integer,\n\t\tbst_fk as integer,\n\t\tmao_fk as integer,\n\t\tbs_status_type_fk as integer,\n\t\tbs_debtor_fk as integer,\n\t\tparent_cr_fk as integer,\n\t\tchild_cr_fk as integer,\n\t\tntt_breathingspacemoratoriumid as string,\n\t\tntt_commencementdate as timestamp,\n\t\tntt_createdfromapi as boolean,\n\t\tntt_expirydate as timestamp,\n\t\tntt_closuredate as timestamp,\n\t\tntt_submissiondate as string,\n\t\tntt_activeregisterperiodstartdate as timestamp,\n\t\tntt_removedfromregisterdate as timestamp,\n\t\tntt_activeregister as boolean,\n\t\tisValid as boolean,\n\t\tisTruncate as boolean,\n\t\tbatch_id as integer,\n\t\tcreatedon as timestamp,\n\t\tmodifiedon as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> sourceSQLLookupBsmFk\nsource(output(\n\t\tbs_creditor_pk_skey as integer,\n\t\tinss_name as string,\n\t\tisValid as boolean,\n\t\tisTruncate as boolean,\n\t\tbatch_id as integer,\n\t\tcreatedon as timestamp,\n\t\tmodifiedon as timestamp,\n\t\tbreathing_space_creditor_type as string,\n\t\tntt_breathingspacecreditorid as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> sourceSQLLookupNttCreditorIdFk\nsource(output(\n\t\tbs_debt_type_pk_skey as integer,\n\t\tisValid as boolean,\n\t\tisTruncate as boolean,\n\t\tbatch_id as integer,\n\t\tcreatedon as timestamp,\n\t\tmodifiedon as timestamp,\n\t\tinss_name as string,\n\t\tinss_debttypeid as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> sourceSQLLookupBsDebtTypeFk\nJoinSQLLookupBsDebtTypeFk select(mapColumn(\n\t\tbatch_id = intBatchId,\n\t\tisValid = blIsValid,\n\t\tcreatedon = tsCreatedOn,\n\t\tmodifiedon = tsModifiedOn,\n\t\tntt_breathingspacedebtid = strNTTBreathingSpaceDebtId,\n\t\tntt_activeregister = blNTTActiveRegister,\n\t\tntt_amount = dcNTTAmount,\n\t\tntt_commencementdate = tsNTTCommencementDate,\n\t\tntt_activeregisterperiodstartdate = tsNTTActiveRegisterPeriodStartDate,\n\t\tntt_removedfromregisterdate = tsNTTRemovedFromRegisterDate,\n\t\tisTruncate = blIsTruncate,\n\t\tbsm_fk = bsm_pk_skey,\n\t\tntt_creditorid_fk = bs_creditor_pk_skey,\n\t\tbs_debt_type_fk = bs_debt_type_pk_skey,\n\t\tntt_removaldate = tsNTTRemovalDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectODS\nSelectODS derive(ntt_breathingspacedebtid = coalesce(ntt_breathingspacedebtid, 'unknown'),\n\t\tcreatedon_dimdate_fk = iif(createdon == toTimestamp('1900-01-01 00:00:00'), -1, toInteger(toString(createdon, 'yyyyMMdd'))),\n\t\tmodifiedon_dimdate_fk = iif(modifiedon == toTimestamp('1900-01-01 00:00:00'), -1, toInteger(toString(modifiedon, 'yyyyMMdd'))),\n\t\tntt_commencementdate_dimdate_fk = iif(ntt_commencementdate == toTimestamp('1900-01-01 00:00:00'), -1, toInteger(toString(ntt_commencementdate, 'yyyyMMdd'))),\n\t\tntt_activeregisterperiodstartdate_dimdate_fk = iif(ntt_activeregisterperiodstartdate == toTimestamp('1900-01-01 00:00:00'), -1, toInteger(toString(ntt_activeregisterperiodstartdate, 'yyyyMMdd'))),\n\t\tntt_removedfromregisterdate_dimdate_fk = iif(ntt_removedfromregisterdate == toTimestamp('1900-01-01 00:00:00'), -1, toInteger(toString(ntt_removedfromregisterdate, 'yyyyMMdd'))),\n\t\tntt_removaldate_dimdate_fk = iif(ntt_removaldate == toTimestamp('1900-01-01 00:00:00'), -1, toInteger(toString(ntt_removaldate, 'yyyyMMdd')))) ~> dcolSQL\nFilterODS, SelectSQLLookupBsmFk join(strNTTBreathingSpaceMoratoriumId == SelectSQLLookupBsmFk@ntt_breathingspacemoratoriumid,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinSQLLookupBsmFk\ndcolSQL alterRow(upsertIf(true())) ~> AlterRowSQL\nsourceSQLLookupBsmFk select(mapColumn(\n\t\tbsm_pk_skey,\n\t\tntt_breathingspacemoratoriumid\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSQLLookupBsmFk\nsourceODS filter(partdist >= toDate($partdistFrom)) ~> FilterODS\nsourceSQLLookupNttCreditorIdFk select(mapColumn(\n\t\tbs_creditor_pk_skey,\n\t\tntt_breathingspacecreditorid\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSQLLookupNttCreditorIdFk\nsourceSQLLookupBsDebtTypeFk select(mapColumn(\n\t\tbs_debt_type_pk_skey,\n\t\tinss_debttypeid\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSQLLookupBsDebtTypeFk\nJoinSQLLookupBsmFk, SelectSQLLookupNttCreditorIdFk join(strNTTCreditorId == ntt_breathingspacecreditorid,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinSQLLookupNttCreditorIdFk\nJoinSQLLookupNttCreditorIdFk, SelectSQLLookupBsDebtTypeFk join(strNTTDebtTypeId == inss_debttypeid,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinSQLLookupBsDebtTypeFk\nAlterRowSQL sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['ntt_breathingspacedebtid'],\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sinkSQL"
+		}
+	}
+}

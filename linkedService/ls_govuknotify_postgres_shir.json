@@ -1,0 +1,23 @@
+{
+	"name": "ls_govuknotify_postgres_shir",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzurePostgreSql",
+		"typeProperties": {
+			"connectionString": "Host=psql-uksouth-dev-notifications01.postgres.database.azure.com;Port=5432;Database=notifications_devdb_user@psql-uksouth-dev-notifications01;UID=reporting_devdb_user@psql-uksouth-dev-notifications01;EncryptionMethod=1;ValidateServerCertificate=0",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "ls_reporting_akv",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "cred-psql-notifications01-etluser"
+			}
+		},
+		"connectVia": {
+			"referenceName": "integrationRuntime1",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

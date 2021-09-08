@@ -1,0 +1,217 @@
+{
+	"name": "pl-curation-validation-notifications",
+	"properties": {
+		"activities": [
+			{
+				"name": "df_curation_validation_notificationapi",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_validation_notificationapi",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceStaging": {
+								"filePath": "staging/bss/dynamics/notifications/ntt_notificationapi.csv",
+								"fileSystem": "curation"
+							},
+							"sinkValidation": {
+								"filePath": "validation/bss/dynamics/notifications/ntt_notificationapi.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "df_curation_validation_notificationemail",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_validation_notificationemail",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceStaging": {
+								"filePath": "staging/bss/dynamics/notifications/ntt_notificationemail.csv",
+								"fileSystem": "curation"
+							},
+							"sinkValidation": {
+								"filePath": "validation/bss/dynamics/notifications/ntt_notificationemail.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "df_curation_validation_notificationletter",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_validation_notificationletter",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceStaging": {
+								"filePath": "staging/bss/dynamics/notifications/ntt_notificationletter.csv",
+								"fileSystem": "curation"
+							},
+							"sinkValidation": {
+								"filePath": "validation/bss/dynamics/notifications/ntt_notificationletter.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "df_curation_validation_notificationletterstatus",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_validation_notificationletterstatus",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceStaging": {
+								"filePath": "staging/bss/dynamics/notifications/ntt_notificationletterstatus.csv",
+								"fileSystem": "curation"
+							},
+							"sinkValidation": {
+								"filePath": "validation/bss/dynamics/notifications/ntt_notificationletterstatus.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "df_curation_validation_notificationemailstatus",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_validation_notificationemailstatus",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceStaging": {
+								"filePath": "staging/bss/dynamics/notifications/ntt_notificationemailstatus.csv",
+								"fileSystem": "curation"
+							},
+							"sinkValidation": {
+								"filePath": "validation/bss/dynamics/notifications/ntt_notificationemailstatus.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "df_curation_validation_notificationtemplate",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_validation_notificationtemplate",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceStaging": {
+								"filePath": "staging/bss/dynamics/notifications/ntt_notificationtemplate.csv",
+								"fileSystem": "curation"
+							},
+							"sinkValidation": {
+								"filePath": "validation/bss/dynamics/notifications/ntt_notificationtemplate.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Transform/BSS/Validation"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-04-14T23:24:00Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

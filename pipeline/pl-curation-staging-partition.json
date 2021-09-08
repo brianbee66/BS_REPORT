@@ -1,0 +1,133 @@
+{
+	"name": "pl-curation-staging-partition",
+	"properties": {
+		"activities": [
+			{
+				"name": "lu-sourcemeta-adls-table-curation",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceQuery": {
+							"value": "PartitionKey eq '@{pipeline().parameters.pstrSourceMetaPartitionKey}' and InUse eq '1'",
+							"type": "Expression"
+						},
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "ds_sourcemeta_adls_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "fel-extract-entity",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "lu-sourcemeta-adls-table-curation",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('lu-sourcemeta-adls-table-curation').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "df-curation-staging-partition",
+							"type": "ExecuteDataFlow",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataflow": {
+									"referenceName": "df_curation_staging_partition",
+									"type": "DataFlowReference",
+									"parameters": {
+										"partDistAttr": {
+											"value": "@item().DistributionAttribute",
+											"type": "Expression"
+										},
+										"pintBatchId": {
+											"value": "@pipeline().parameters.pintBatchId",
+											"type": "Expression"
+										}
+									},
+									"datasetParameters": {
+										"sourceLanding": {
+											"fileSystem": {
+												"value": "@substring(item().SinkFilePath,0,indexof(item().SinkFilePath,'/'))",
+												"type": "Expression"
+											},
+											"filePath": {
+												"value": "@substring(item().SinkFilePath, add(indexof(item().SinkFilePath,'/'),1), sub(length(item().SinkFilePath),length(substring(item().SinkFilePath,0,add(indexof(item().SinkFilePath,'/'),1)))))",
+												"type": "Expression"
+											},
+											"fileName": {
+												"value": "@item().SinkFileName",
+												"type": "Expression"
+											},
+											"columnDelimiter": {
+												"value": "@item().ColumnDelimiter",
+												"type": "Expression"
+											}
+										},
+										"sinkCurationStagingPartition": {
+											"filePath": {
+												"value": "@concat('staging', '/', substring(item().SinkFilePath, add(indexof(item().SinkFilePath,'/'),1), sub(length(item().SinkFilePath),length(substring(item().SinkFilePath,0,add(indexof(item().SinkFilePath,'/'),1))))) , '/', item().SinkFileName)",
+												"type": "Expression"
+											},
+											"fileSystem": "curation"
+										}
+									}
+								},
+								"integrationRuntime": {
+									"referenceName": "ir-uksouth-ermdf01",
+									"type": "IntegrationRuntimeReference"
+								},
+								"traceLevel": "Fine"
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"pintBatchId": {
+				"type": "int",
+				"defaultValue": 0
+			},
+			"pstrSourceMetaPartitionKey": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Transform/BSS"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-04-14T23:24:00Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,11 @@
+{
+	"name": "ls_reporting_akv",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://kv-erbss-dev-uksouth-001.vault.azure.net/"
+		}
+	}
+}

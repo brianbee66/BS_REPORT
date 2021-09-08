@@ -1,0 +1,47 @@
+{
+	"name": "df_curation_validation_notificationtemplate",
+	"properties": {
+		"folder": {
+			"name": "Transform/BSS/Notifications"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceStaging"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sinkValidation"
+				}
+			],
+			"transformations": [
+				{
+					"name": "decolTypeConvertion"
+				},
+				{
+					"name": "dcolIsValid"
+				},
+				{
+					"name": "dcolMandatoryValue"
+				},
+				{
+					"name": "dcolIsTruncate"
+				},
+				{
+					"name": "dcolMandatoryTruncate"
+				}
+			],
+			"script": "source(output(\n\t\tntt_govukidentifier as string,\n\t\torganizationid as string,\n\t\tntt_personalisation as string,\n\t\tntt_name as string,\n\t\tstatecode as string,\n\t\tstatuscode as string,\n\t\tcreatedby as string,\n\t\tntt_businessunit as string,\n\t\tntt_templatetype as string,\n\t\tmodifiedby as string,\n\t\tntt_identifier as string,\n\t\tcreatedon as string,\n\t\tntt_notificationtemplateid as string,\n\t\tntt_description as string,\n\t\tmodifiedon as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceStaging\nsourceStaging derive(tsModifiedOn = toTimestamp(modifiedon),\n\t\ttsCreatedOn = toTimestamp(createdon),\n\t\tstrNTTNotificationTemplateId = toString(ntt_notificationtemplateid),\n\t\tstrNTTGovUkIdentifier = toString(ntt_govukidentifier),\n\t\tstrNTTIdentifier = toString(ntt_identifier),\n\t\tstrNTTName = toString(ntt_name),\n\t\tstrNTTDescription = toString(ntt_description)) ~> decolTypeConvertion\ndecolTypeConvertion derive(blIsValid = iif(isNull(strNTTNotificationTemplateId) || isNull(strNTTGovUkIdentifier) || isNull(tsModifiedOn) || isNull(tsCreatedOn) || isNull(strNTTName) || isNull(ntt_identifier), toBoolean('0'), toBoolean('1'))) ~> dcolIsValid\ndcolIsValid derive(tsModifiedOn = coalesce(tsModifiedOn, toTimestamp('1900-01-01 00:00:00')),\n\t\ttsCreatedOn = coalesce(tsCreatedOn, toTimestamp('1900-01-01 00:00:00')),\n\t\tstrNTTNotificationTemplateId = coalesce(strNTTNotificationTemplateId, 'missing'),\n\t\tstrNTTGovUkIdentifier = coalesce(strNTTGovUkIdentifier, 'missing'),\n\t\tstrNTTIdentifier = coalesce(strNTTIdentifier, 'missing'),\n\t\tstrNTTName = coalesce(strNTTName, 'missing'),\n\t\tstrNTTDescription = coalesce(strNTTDescription, 'missing')) ~> dcolMandatoryValue\ndcolMandatoryValue derive(blIsTruncate = iif(length(strNTTNotificationTemplateId) > 36 || length(strNTTDescription) > 255 || length(ntt_govukidentifier) > 255 || length(ntt_identifier) > 255 || length(strNTTName) > 255 , toBoolean('1'), toBoolean('0'))) ~> dcolIsTruncate\ndcolIsTruncate derive(strNTTNotificationTemplateId = left(strNTTNotificationTemplateId, 36),\n\t\tstrNTTName = left(strNTTName, 255),\n\t\tstrNTTDescription = left(strNTTDescription, 255),\n\t\tstrNTTGovUkIdentifier = left(strNTTGovUkIdentifier, 255),\n\t\tstrNTTIdentifier = left(strNTTIdentifier, 255)) ~> dcolMandatoryTruncate\ndcolMandatoryTruncate sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\ttruncate: true,\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sinkValidation"
+		}
+	}
+}

@@ -1,0 +1,38 @@
+{
+	"name": "df_curation_preparation_breathingspacedebt",
+	"properties": {
+		"folder": {
+			"name": "Transform/BSS/Moratoriums"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceValidation"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_reporting_adls",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkODS"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectColumns"
+				},
+				{
+					"name": "AlterRowSink"
+				}
+			],
+			"script": "source(output(\n\t\tstatecode as string,\n\t\tntt_referencenumber as string,\n\t\tcreatedon as string,\n\t\tntt_triggercreditorsubmitnotification as string,\n\t\tntt_creditorexternalreferenceid as string,\n\t\townerid as string,\n\t\tmodifiedon as string,\n\t\tntt_triggernotification as string,\n\t\tntt_debttypeid as string,\n\t\ttransactioncurrencyid as string,\n\t\tntt_activeregister as string,\n\t\texchangerate as string,\n\t\tmodifiedby as string,\n\t\tntt_amount_base as string,\n\t\tstatuscode as string,\n\t\towningbusinessunit as string,\n\t\tntt_breathingspacedebtid as string,\n\t\tntt_triggercreditorexpirynotification as string,\n\t\tntt_amount as string,\n\t\tcreatedby as string,\n\t\tntt_debtstatusid as string,\n\t\tntt_creditorid as string,\n\t\tntt_breathingspacemoratoriumid as string,\n\t\tntt_name as string,\n\t\towninguser as string,\n\t\tntt_nationalinsurancenumber as string,\n\t\tmodifiedonbehalfby as string,\n\t\tntt_commencementdate as string,\n\t\ttimezoneruleversionnumber as string,\n\t\tntt_expirydate as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date,\n\t\tntt_previouslysold as string,\n\t\tntt_otherdebttype as string,\n\t\tntt_activeregisterperiodenddate as string,\n\t\tntt_retentionperiodenddate as string,\n\t\tntt_retentionperiodstartdate as string,\n\t\tntt_activeregisterperiodstartdate as string,\n\t\tntt_removedfromregisterdate as string,\n\t\tntt_removaldate as string,\n\t\tblIsValid as boolean,\n\t\ttsCreatedOn as timestamp,\n\t\ttsModifiedOn as timestamp,\n\t\tstrNTTBreathingSpaceDebtId as string,\n\t\tblNTTActiveRegister as boolean,\n\t\tdcNTTAmount as decimal(38,4),\n\t\tstrNTTBreathingSpaceMoratoriumId as string,\n\t\tstrNTTCreditorId as string,\n\t\tstrNTTDebtTypeId as string,\n\t\ttsNTTCommencementDate as timestamp,\n\t\ttsNTTActiveRegisterPeriodStartDate as timestamp,\n\t\ttsNTTRemovedFromRegisterDate as timestamp,\n\t\ttsNTTRemovalDate as timestamp,\n\t\tblIsTruncate as boolean,\n\t\tsteNTTCreditorId as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceValidation\nsourceValidation select(mapColumn(\n\t\tstatecode,\n\t\tntt_referencenumber,\n\t\tcreatedon,\n\t\tntt_triggercreditorsubmitnotification,\n\t\tntt_creditorexternalreferenceid,\n\t\townerid,\n\t\tmodifiedon,\n\t\tntt_triggernotification,\n\t\tntt_debttypeid,\n\t\ttransactioncurrencyid,\n\t\tntt_activeregister,\n\t\texchangerate,\n\t\tmodifiedby,\n\t\tntt_amount_base,\n\t\tstatuscode,\n\t\towningbusinessunit,\n\t\tntt_breathingspacedebtid,\n\t\tntt_triggercreditorexpirynotification,\n\t\tntt_amount,\n\t\tcreatedby,\n\t\tntt_debtstatusid,\n\t\tntt_creditorid,\n\t\tntt_breathingspacemoratoriumid,\n\t\tntt_name,\n\t\towninguser,\n\t\tntt_nationalinsurancenumber,\n\t\tmodifiedonbehalfby,\n\t\tntt_commencementdate,\n\t\ttimezoneruleversionnumber,\n\t\tntt_expirydate,\n\t\tintBatchId,\n\t\tpartdist,\n\t\tntt_previouslysold,\n\t\tntt_otherdebttype,\n\t\tntt_retentionperiodenddate,\n\t\tntt_retentionperiodstartdate,\n\t\tntt_activeregisterperiodstartdate,\n\t\tntt_activeregisterperiodenddate,\n\t\tblIsValid,\n\t\ttsCreatedOn,\n\t\ttsModifiedOn,\n\t\tstrNTTBreathingSpaceDebtId,\n\t\tblNTTActiveRegister,\n\t\tdcNTTAmount,\n\t\tstrNTTBreathingSpaceMoratoriumId,\n\t\tstrNTTCreditorId,\n\t\tstrNTTDebtTypeId,\n\t\ttsNTTCommencementDate,\n\t\ttsNTTActiveRegisterPeriodStartDate,\n\t\ttsNTTRemovedFromRegisterDate,\n\t\tblIsTruncate,\n\t\tsteNTTCreditorId,\n\t\tntt_removedfromregisterdate,\n\t\tntt_removaldate,\n\t\ttsNTTRemovalDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumns\nSelectColumns alterRow(upsertIf(true())) ~> AlterRowSink\nAlterRowSink sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'delta',\n\tfileSystem: 'curation',\n\tfolderPath: 'ods/bss/dynamics/moratoriums/breathingspacedebt',\n\tmergeSchema: false,\n\tautoCompact: false,\n\toptimizedWrite: false,\n\tvacuum: 0,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['strNTTBreathingSpaceDebtId'],\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('key',\n\t\t0,\n\t\tpartdist\n\t)) ~> sinkODS"
+		}
+	}
+}

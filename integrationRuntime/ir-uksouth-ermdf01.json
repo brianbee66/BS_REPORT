@@ -1,0 +1,16 @@
+{
+	"name": "ir-uksouth-ermdf01",
+	"properties": {
+		"type": "Managed",
+		"typeProperties": {
+			"computeProperties": {
+				"location": "UK South",
+				"dataFlowProperties": {
+					"computeType": "MemoryOptimized",
+					"coreCount": 32,
+					"timeToLive": 10
+				}
+			}
+		}
+	}
+}

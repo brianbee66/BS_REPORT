@@ -1,0 +1,38 @@
+{
+	"name": "df_curation_preparation_debttype",
+	"properties": {
+		"folder": {
+			"name": "Transform/BSS/References BSS"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceValidation"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_reporting_adls",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkODS"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectColumns"
+				},
+				{
+					"name": "AlterRowSink"
+				}
+			],
+			"script": "source(output(\n\t\tinss_identifier as string,\n\t\torganizationid as string,\n\t\tinss_debttypeid as string,\n\t\tstatecode as string,\n\t\tstatuscode as string,\n\t\tcreatedby as string,\n\t\tmodifiedon as string,\n\t\tmodifiedby as string,\n\t\tcreatedon as string,\n\t\tinss_name as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date,\n\t\tblIsValid as boolean,\n\t\ttsModifiedOn as timestamp,\n\t\ttsCreatedOn as timestamp,\n\t\tstrINSSDebtTypeId as string,\n\t\tstrINSSName as string,\n\t\tblIsTruncate as boolean\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceValidation\nsourceValidation select(mapColumn(\n\t\tinss_identifier,\n\t\torganizationid,\n\t\tinss_debttypeid,\n\t\tstatecode,\n\t\tstatuscode,\n\t\tcreatedby,\n\t\tmodifiedon,\n\t\tmodifiedby,\n\t\tcreatedon,\n\t\tinss_name,\n\t\tintBatchId,\n\t\tpartdist,\n\t\tblIsValid,\n\t\ttsModifiedOn,\n\t\ttsCreatedOn,\n\t\tstrINSSDebtTypeId,\n\t\tstrINSSName,\n\t\tblIsTruncate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumns\nSelectColumns alterRow(upsertIf(true())) ~> AlterRowSink\nAlterRowSink sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'delta',\n\tfileSystem: 'curation',\n\tfolderPath: 'ods/bss/dynamics/references-bss/debttype',\n\tmergeSchema: false,\n\tautoCompact: false,\n\toptimizedWrite: false,\n\tvacuum: 0,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['strINSSDebtTypeId'],\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('key',\n\t\t0,\n\t\tpartdist\n\t)) ~> sinkODS"
+		}
+	}
+}

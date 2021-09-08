@@ -1,0 +1,38 @@
+{
+	"name": "df_curation_preparation_customaudit",
+	"properties": {
+		"folder": {
+			"name": "Transform/BSS/References BSS"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceValidation"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_reporting_adls",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkODS"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectColumns"
+				},
+				{
+					"name": "AlterRowSink"
+				}
+			],
+			"script": "source(output(\n\t\tntt_correlation as string,\n\t\tntt_breathingspacemoratoriumid as string,\n\t\towningbusinessunit as string,\n\t\tntt_customauditid as string,\n\t\tntt_name as string,\n\t\tstatecode as string,\n\t\tstatuscode as string,\n\t\tcreatedby as string,\n\t\ttimezoneruleversionnumber as string,\n\t\tntt_newvalue as string,\n\t\tntt_order as string,\n\t\tntt_attributemodifiedon as string,\n\t\townerid as string,\n\t\tmodifiedon as string,\n\t\towninguser as string,\n\t\tmodifiedby as string,\n\t\tntt_action as string,\n\t\tcreatedon as string,\n\t\tntt_displayname as string,\n\t\tntt_originalvalue as string,\n\t\tntt_breathingspacedebtorid as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date,\n\t\tblIsValid as boolean,\n\t\ttsModifiedOn as timestamp,\n\t\ttsCreatedOn as timestamp,\n\t\tstrNTTCustomAuditId as string,\n\t\tstrNTTBreathingSpaceDebtId as string,\n\t\tstrNTTBreathingSpaceMoratoriumId as string,\n\t\tblIsTruncate as boolean,\n\t\tstrINSSDebtTypeId as string,\n\t\tstrNTTOriginalValue as string,\n\t\tstrNTTNewValue as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceValidation\nsourceValidation select(mapColumn(\n\t\tntt_correlation,\n\t\tntt_breathingspacemoratoriumid,\n\t\towningbusinessunit,\n\t\tntt_customauditid,\n\t\tntt_name,\n\t\tstatecode,\n\t\tstatuscode,\n\t\tcreatedby,\n\t\ttimezoneruleversionnumber,\n\t\tntt_newvalue,\n\t\tntt_order,\n\t\tntt_attributemodifiedon,\n\t\townerid,\n\t\tmodifiedon,\n\t\towninguser,\n\t\tmodifiedby,\n\t\tntt_action,\n\t\tcreatedon,\n\t\tntt_displayname,\n\t\tntt_originalvalue,\n\t\tntt_breathingspacedebtorid,\n\t\tintBatchId,\n\t\tpartdist,\n\t\tblIsValid,\n\t\ttsModifiedOn,\n\t\ttsCreatedOn,\n\t\tstrNTTCustomAuditId,\n\t\tstrNTTBreathingSpaceDebtId,\n\t\tstrNTTBreathingSpaceMoratoriumId,\n\t\tblIsTruncate,\n\t\tstrINSSDebtTypeId,\n\t\tstrNTTOriginalValue,\n\t\tstrNTTNewValue\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumns\nSelectColumns alterRow(upsertIf(true())) ~> AlterRowSink\nAlterRowSink sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'delta',\n\tfileSystem: 'curation',\n\tfolderPath: 'ods/bss/dynamics/references-bss/customaudit',\n\tmergeSchema: false,\n\tautoCompact: false,\n\toptimizedWrite: false,\n\tvacuum: 0,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['strNTTCustomAuditId'],\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('key',\n\t\t0,\n\t\tpartdist\n\t)) ~> sinkODS"
+		}
+	}
+}

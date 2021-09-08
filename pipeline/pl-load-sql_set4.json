@@ -1,0 +1,108 @@
+{
+	"name": "pl-load-sql_set4",
+	"properties": {
+		"activities": [
+			{
+				"name": "df_load_sql_breathingspacedebt",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "lu-hwm-ntt_breathingspacedebt",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_load_sql_breathingspacedebt",
+						"type": "DataFlowReference",
+						"parameters": {
+							"partdistFrom": {
+								"value": "'@{activity('lu-hwm-ntt_breathingspacedebt').output.firstRow.HighWaterMarkMax}'",
+								"type": "Expression"
+							}
+						},
+						"datasetParameters": {
+							"sourceSQLLookupBsmFk": {
+								"table": "BREATHING_SPACE_MORATORIUM",
+								"schema": "ERBSSS001"
+							},
+							"sourceSQLLookupNttCreditorIdFk": {
+								"table": "BREATHING_SPACE_CREDITOR",
+								"schema": "ERBSSS001"
+							},
+							"sourceSQLLookupBsDebtTypeFk": {
+								"table": "BREATHING_SPACE_DEBT_TYPE",
+								"schema": "ERBSSS001"
+							},
+							"sinkSQL": {
+								"table": "BREATHING_SPACE_DEBT",
+								"schema": "ERBSSS001"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "lu-hwm-ntt_breathingspacedebt",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceQuery": {
+							"value": "PartitionKey eq 'Extract-BSS-Dynamics-Moratoriums-ntt_breathingspacedebt' and RowKey eq '@{pipeline().parameters.pintBatchId}'",
+							"type": "Expression"
+						},
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "ds_batchparameter_adls_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			}
+		],
+		"parameters": {
+			"pintBatchId": {
+				"type": "int",
+				"defaultValue": 0
+			}
+		},
+		"variables": {
+			"pstrPartDistFrom": {
+				"type": "String",
+				"defaultValue": "1900-01-01"
+			}
+		},
+		"folder": {
+			"name": "Load/BSS"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-04-14T23:23:58Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

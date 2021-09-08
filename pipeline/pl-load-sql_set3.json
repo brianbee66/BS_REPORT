@@ -1,0 +1,222 @@
+{
+	"name": "pl-load-sql_set3",
+	"properties": {
+		"activities": [
+			{
+				"name": "df_load_sql_debtordemographic",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "lu-hwm-inss_inssaddress",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_load_sql_debtordemographic",
+						"type": "DataFlowReference",
+						"parameters": {
+							"partdistFrom": {
+								"value": "'@{activity('lu-hwm-inss_inssaddress').output.firstRow.HighWaterMarkMax}'",
+								"type": "Expression"
+							}
+						},
+						"datasetParameters": {
+							"sourceSQLLookupDebtor": {
+								"table": "BREATHING_SPACE_DEBTOR",
+								"schema": "ERBSSS001"
+							},
+							"sinkSQL": {
+								"table": "DEBTOR_DEMOGRAPHIC",
+								"schema": "ERBSSS001"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "lu-hwm-inss_inssaddress",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceQuery": {
+							"value": "PartitionKey eq 'Extract-BSS-Dynamics-References-inss_inssaddress' and RowKey eq '@{pipeline().parameters.pintBatchId}'",
+							"type": "Expression"
+						},
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "ds_batchparameter_adls_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "df_load_sql_breathingspacemoratorium",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "lu-hwm-ntt_breathingspacemoratorium",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_load_sql_breathingspacemoratorium",
+						"type": "DataFlowReference",
+						"parameters": {
+							"partdistFrom": {
+								"value": "'@{activity('lu-hwm-ntt_breathingspacemoratorium').output.firstRow.HighWaterMarkMax}'",
+								"type": "Expression"
+							}
+						},
+						"datasetParameters": {
+							"sourceSQLLookupBstFk": {
+								"table": "BREATHING_SPACE_TYPE",
+								"schema": "ERBSSS001"
+							},
+							"sourceSQLLookupMaoFk": {
+								"table": "MONEY_ADVISER_ORGANISATION",
+								"schema": "ERBSSS001"
+							},
+							"sourceLookupBsStatusTypeFk": {
+								"table": "BREATHING_SPACE_STATUS_TYPE",
+								"schema": "ERBSSS001"
+							},
+							"sourceLookupBsDebtorFk": {
+								"table": "BREATHING_SPACE_DEBTOR",
+								"schema": "ERBSSS001"
+							},
+							"sourceLookupParentCrFk": {
+								"table": "PARENT_CANCELLATION_REASON",
+								"schema": "ERBSSS001"
+							},
+							"sourceLookupChildCrFk": {
+								"table": "CHILD_CANCELLATION_REASON",
+								"schema": "ERBSSS001"
+							},
+							"sinkSQL": {
+								"table": "BREATHING_SPACE_MORATORIUM",
+								"schema": "ERBSSS001"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "lu-hwm-ntt_breathingspacemoratorium",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceQuery": {
+							"value": "PartitionKey eq 'Extract-BSS-Dynamics-Moratoriums-ntt_breathingspacemoratorium' and RowKey eq '@{pipeline().parameters.pintBatchId}'",
+							"type": "Expression"
+						},
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "ds_batchparameter_adls_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "sp_sqlproc_processbreathingspacemoratoriumsnapshot",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "df_load_sql_breathingspacemoratorium",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "ERBSSS001.uspProcessBreathingSpaceMoratoriumMonthlySnapshot"
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_reporting_mssql",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"pintBatchId": {
+				"type": "int",
+				"defaultValue": 0
+			}
+		},
+		"variables": {
+			"pstrPartDistFrom": {
+				"type": "String",
+				"defaultValue": "1900-01-01"
+			}
+		},
+		"folder": {
+			"name": "Load/BSS"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-04-14T23:24:04Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

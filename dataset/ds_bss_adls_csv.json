@@ -1,0 +1,42 @@
+{
+	"name": "ds_bss_adls_csv",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_reporting_adls",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"sinkFilePath": {
+				"type": "string"
+			},
+			"sinkFileName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "BSS/ADLS"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().sinkFileName",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().sinkFilePath",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": "\t",
+			"rowDelimiter": "\r",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

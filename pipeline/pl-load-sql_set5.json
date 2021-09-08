@@ -1,0 +1,515 @@
+{
+	"name": "pl-load-sql_set5",
+	"properties": {
+		"activities": [
+			{
+				"name": "df_load_sql_dynnotificationapi",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "lu-hwm-ntt_notificationapi",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_load_sql_dynnotificationapi",
+						"type": "DataFlowReference",
+						"parameters": {
+							"partdistFrom": {
+								"value": "'@{activity('lu-hwm-ntt_notificationapi').output.firstRow.HighWaterMarkMax}'",
+								"type": "Expression"
+							}
+						},
+						"datasetParameters": {
+							"sourceSQLLookupBsmFk": {
+								"table": "BREATHING_SPACE_MORATORIUM",
+								"schema": "ERBSSS001"
+							},
+							"sourceSQLLookupBsDebtFk": {
+								"table": "BREATHING_SPACE_DEBT",
+								"schema": "ERBSSS001"
+							},
+							"sourceSQLLookupTemplateFk": {
+								"table": "DYN_NOTIFICATION_TEMPLATE",
+								"schema": "ERBSSS001"
+							},
+							"sinkSQL": {
+								"table": "DYN_NOTIFICATION_API",
+								"schema": "ERBSSS001"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "lu-hwm-ntt_notificationapi",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceQuery": {
+							"value": "PartitionKey eq 'Extract-BSS-Dynamics-Notifications-ntt_notificationapi' and RowKey eq '@{pipeline().parameters.pintBatchId}'",
+							"type": "Expression"
+						},
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "ds_batchparameter_adls_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "df_load_sql_dynnotificationletter",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "lu-hwm-ntt_notificationletter",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_load_sql_dynnotificationletter",
+						"type": "DataFlowReference",
+						"parameters": {
+							"partdistFrom": {
+								"value": "'@{activity('lu-hwm-ntt_notificationletter').output.firstRow.HighWaterMarkMax}'",
+								"type": "Expression"
+							}
+						},
+						"datasetParameters": {
+							"sourceSQLLookupBsmFk": {
+								"table": "BREATHING_SPACE_MORATORIUM",
+								"schema": "ERBSSS001"
+							},
+							"sourceSQLLookupBsDebtFk": {
+								"table": "BREATHING_SPACE_DEBT",
+								"schema": "ERBSSS001"
+							},
+							"sourceSQLLookupStatusFk": {
+								"table": "DYN_NOTIFICATION_LETTER_STATUS",
+								"schema": "ERBSSS001"
+							},
+							"sourceSQLLookupTemplateFk": {
+								"table": "DYN_NOTIFICATION_TEMPLATE",
+								"schema": "ERBSSS001"
+							},
+							"sinkSQL": {
+								"table": "DYN_NOTIFICATION_LETTER",
+								"schema": "ERBSSS001"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "lu-hwm-ntt_notificationletter",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceQuery": {
+							"value": "PartitionKey eq 'Extract-BSS-Dynamics-Notifications-ntt_notificationletter' and RowKey eq '@{pipeline().parameters.pintBatchId}'",
+							"type": "Expression"
+						},
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "ds_batchparameter_adls_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "df_load_sql_dynnotificationemail",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "lu-hwm-ntt_notificationemail",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_load_sql_dynnotificationemail",
+						"type": "DataFlowReference",
+						"parameters": {
+							"partdistFrom": {
+								"value": "'@{activity('lu-hwm-ntt_notificationemail').output.firstRow.HighWaterMarkMax}'",
+								"type": "Expression"
+							}
+						},
+						"datasetParameters": {
+							"sourceSQLLookupBsmFk": {
+								"table": "BREATHING_SPACE_MORATORIUM",
+								"schema": "ERBSSS001"
+							},
+							"sourceSQLLookupBsDebtFk": {
+								"table": "BREATHING_SPACE_DEBT",
+								"schema": "ERBSSS001"
+							},
+							"sourceSQLLookupStatusFk": {
+								"table": "DYN_NOTIFICATION_EMAIL_STATUS",
+								"schema": "ERBSSS001"
+							},
+							"sourceSQLLookupTemplateFk": {
+								"table": "DYN_NOTIFICATION_TEMPLATE",
+								"schema": "ERBSSS001"
+							},
+							"sinkSQL": {
+								"table": "DYN_NOTIFICATION_EMAIL",
+								"schema": "ERBSSS001"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "lu-hwm-ntt_notificationemail",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceQuery": {
+							"value": "PartitionKey eq 'Extract-BSS-Dynamics-Notifications-ntt_notificationemail' and RowKey eq '@{pipeline().parameters.pintBatchId}'",
+							"type": "Expression"
+						},
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "ds_batchparameter_adls_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "df_load_sql_debteligibiityreview",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "lu-hwm-ntt_debteligibilityreview",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_load_sql_debteligibiityreview",
+						"type": "DataFlowReference",
+						"parameters": {
+							"partdistFrom": {
+								"value": "'@{activity('lu-hwm-ntt_debteligibilityreview').output.firstRow.HighWaterMarkMax}'",
+								"type": "Expression"
+							}
+						},
+						"datasetParameters": {
+							"sourceSQLLookupDebtErstFk": {
+								"table": "DEBT_ELIGIBILITY_REVIEW_STATUS_TYPE",
+								"schema": "ERBSSS001"
+							},
+							"sourceSQLLookupBsDebtFk": {
+								"table": "BREATHING_SPACE_DEBT",
+								"schema": "ERBSSS001"
+							},
+							"sinkSQL": {
+								"table": "DEBT_ELIGIBILITY_REVIEW",
+								"schema": "ERBSSS001"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "lu-hwm-ntt_debteligibilityreview",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceQuery": {
+							"value": "PartitionKey eq 'Extract-BSS-Dynamics-Moratoriums-ntt_debteligibilityreview' and RowKey eq '@{pipeline().parameters.pintBatchId}'",
+							"type": "Expression"
+						},
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "ds_batchparameter_adls_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "df_load_sql_debtoreligibiityreview",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "lu-hwm-ntt_debtoreligibilityreview",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_load_sql_debtoreligibiityreview",
+						"type": "DataFlowReference",
+						"parameters": {
+							"partdistFrom": {
+								"value": "'@{activity('lu-hwm-ntt_debtoreligibilityreview').output.firstRow.HighWaterMarkMax}'",
+								"type": "Expression"
+							}
+						},
+						"datasetParameters": {
+							"sourceSQLLookupDebtorErstFk": {
+								"table": "DEBTOR_ELIGIBILITY_REVIEW_STATUS_TYPE",
+								"schema": "ERBSSS001"
+							},
+							"sourceSQLLookupBsmFk": {
+								"table": "BREATHING_SPACE_MORATORIUM",
+								"schema": "ERBSSS001"
+							},
+							"sinkSQL": {
+								"table": "DEBTOR_ELIGIBILITY_REVIEW",
+								"schema": "ERBSSS001"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "lu-hwm-ntt_debtoreligibilityreview",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceQuery": {
+							"value": "PartitionKey eq 'Extract-BSS-Dynamics-Debtors-ntt_debtoreligibilityreview' and RowKey eq '@{pipeline().parameters.pintBatchId}'",
+							"type": "Expression"
+						},
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "ds_batchparameter_adls_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "df_load_sql_breathingspacedebtaudit",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "lu-hwm-ntt_customaudit",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_load_sql_breathingspacedebtaudit",
+						"type": "DataFlowReference",
+						"parameters": {
+							"partdistFrom": {
+								"value": "'@{activity('lu-hwm-ntt_customaudit').output.firstRow.HighWaterMarkMax}'",
+								"type": "Expression"
+							}
+						},
+						"datasetParameters": {
+							"sourceSQLLookupDebFk": {
+								"table": "BREATHING_SPACE_DEBT",
+								"schema": "ERBSSS001"
+							},
+							"sinkSQL": {
+								"table": "BREATHING_SPACE_DEBT_AUDIT",
+								"schema": "ERBSSS001"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "lu-hwm-ntt_customaudit",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceQuery": {
+							"value": "PartitionKey eq 'Extract-BSS-Dynamics-References-ntt_customaudit' and RowKey eq '@{pipeline().parameters.pintBatchId}'",
+							"type": "Expression"
+						},
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "ds_batchparameter_adls_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			}
+		],
+		"parameters": {
+			"pintBatchId": {
+				"type": "int",
+				"defaultValue": 0
+			}
+		},
+		"variables": {
+			"pstrPartDistFrom": {
+				"type": "String",
+				"defaultValue": "1900-01-01"
+			}
+		},
+		"folder": {
+			"name": "Load/BSS"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-04-14T23:23:58Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

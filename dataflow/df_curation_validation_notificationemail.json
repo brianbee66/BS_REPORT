@@ -1,0 +1,47 @@
+{
+	"name": "df_curation_validation_notificationemail",
+	"properties": {
+		"folder": {
+			"name": "Transform/BSS/Notifications"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceStaging"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sinkValidation"
+				}
+			],
+			"transformations": [
+				{
+					"name": "decolTypeConvertion"
+				},
+				{
+					"name": "dcolIsValid"
+				},
+				{
+					"name": "dcolMandatoryValue"
+				},
+				{
+					"name": "dcolIsTruncate"
+				},
+				{
+					"name": "dcolMandatoryTruncate"
+				}
+			],
+			"script": "source(output(\n\t\tstatecode as string,\n\t\tntt_submissionaccepted as string,\n\t\tregardingobjectid as string,\n\t\tntt_notificationemailstatusid as string,\n\t\tntt_notificationstatusupdated as string,\n\t\tleftvoicemail as string,\n\t\tcreatedon as string,\n\t\tntt_payload as string,\n\t\tisbilled as string,\n\t\tsubject as string,\n\t\townerid as string,\n\t\tmodifiedon as string,\n\t\tntt_templateid as string,\n\t\tversionnumber as string,\n\t\tprioritycode as string,\n\t\tmodifiedby as string,\n\t\tntt_resubmit as string,\n\t\tisregularactivity as string,\n\t\tismapiprivate as string,\n\t\tstatuscode as string,\n\t\tactivitytypecode as string,\n\t\tinstancetypecode as string,\n\t\tntt_lastsubmittedon as string,\n\t\tisworkflowcreated as string,\n\t\tdeliveryprioritycode as string,\n\t\ttimezoneruleversionnumber as string,\n\t\tcreatedby as string,\n\t\towningbusinessunit as string,\n\t\towninguser as string,\n\t\tntt_notificationstatus as string,\n\t\tactivityid as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceStaging\nsourceStaging derive(tsModifiedOn = toTimestamp(modifiedon),\n\t\ttsCreatedOn = toTimestamp(createdon),\n\t\tstrActivityId = toString(activityid),\n\t\tblNTTSubmissionAccepted = toBoolean(ntt_submissionaccepted),\n\t\ttsSentOn = toTimestamp(byName('senton')),\n\t\tstrRegardingObjectId = toString(regardingobjectid),\n\t\tstrNTTNotificationEmailStatusId = toString(ntt_notificationemailstatusid),\n\t\tstrNTTNotificationStatus = toString(ntt_notificationstatus),\n\t\ttsNTTNotificationStatusUpdated = toTimestamp(ntt_notificationstatusupdated),\n\t\tstrNTTTemplateId = toString(ntt_templateid)) ~> decolTypeConvertion\ndecolTypeConvertion derive(blIsValid = iif(isNull(strActivityId) || isNull(tsModifiedOn) || isNull(tsCreatedOn) || isNull(strRegardingObjectId) || isNull(strNTTNotificationEmailStatusId) || isNull(strNTTNotificationStatus) || isNull(tsNTTNotificationStatusUpdated) || isNull(strNTTTemplateId) ||\r\n(tsNTTNotificationStatusUpdated < toTimestamp('1900-01-01 00:00:00') || tsNTTNotificationStatusUpdated > toTimestamp('2062-08-12 00:00:00'))\r\n, toBoolean('0'), toBoolean('1'))) ~> dcolIsValid\ndcolIsValid derive(tsModifiedOn = coalesce(tsModifiedOn, toTimestamp('1900-01-01 00:00:00')),\n\t\ttsCreatedOn = coalesce(tsCreatedOn, toTimestamp('1900-01-01 00:00:00')),\n\t\tstrActivityId = coalesce(strActivityId, 'missing'),\n\t\tblNTTSubmissionAccepted = coalesce(blNTTSubmissionAccepted, toBoolean('false')),\n\t\ttsSentOn = coalesce(tsSentOn, toTimestamp('1900-01-01 00:00:00')),\n\t\tstrNTTNotificationEmailStatusId = coalesce(strNTTNotificationEmailStatusId, 'missing'),\n\t\tstrNTTNotificationStatus = coalesce(strNTTNotificationStatus, 'missing'),\n\t\ttsNTTNotificationStatusUpdated = iif(isNull(tsNTTNotificationStatusUpdated) || (tsNTTNotificationStatusUpdated < toTimestamp('1900-01-01 00:00:00') || tsNTTNotificationStatusUpdated > toTimestamp('2062-08-12 00:00:00')),toTimestamp('1900-01-01 00:00:00'), tsNTTNotificationStatusUpdated),\n\t\tstrNTTTemplateId = coalesce(strNTTTemplateId, 'missing')) ~> dcolMandatoryValue\ndcolMandatoryValue derive(blIsTruncate = iif(length(strActivityId) > 36 || length(strRegardingObjectId) > 36 || length(strNTTNotificationEmailStatusId) > 36 || length(strNTTNotificationStatus) > 75 || length(strNTTTemplateId) > 36, toBoolean('1'), toBoolean('0'))) ~> dcolIsTruncate\ndcolIsTruncate derive(strActivityId = left(strActivityId, 36),\n\t\tstrRegardingObjectId = left(strRegardingObjectId, 36),\n\t\tstrNTTNotificationEmailStatusId = left(strNTTNotificationEmailStatusId, 36),\n\t\tstrNTTNotificationStatus = left(strNTTNotificationStatus, 75),\n\t\tstrNTTTemplateId = left(strNTTTemplateId, 36)) ~> dcolMandatoryTruncate\ndcolMandatoryTruncate sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\ttruncate: true,\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sinkValidation"
+		}
+	}
+}

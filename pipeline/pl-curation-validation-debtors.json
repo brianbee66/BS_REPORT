@@ -1,0 +1,183 @@
+{
+	"name": "pl-curation-validation-debtors",
+	"properties": {
+		"activities": [
+			{
+				"name": "df_curation_validation_debtor",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_validation_debtor",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceStaging": {
+								"filePath": "staging/bss/dynamics/debtors/ntt_breathingspacedebtor.csv",
+								"fileSystem": "curation"
+							},
+							"sinkValidation": {
+								"filePath": "validation/bss/dynamics/debtors/ntt_breathingspacedebtor.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "df_curation_validation_debtoraddress",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_validation_debtoraddress",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceStaging": {
+								"filePath": "staging/bss/dynamics/debtors/ntt_breathingspacedebtor_inss_inssaddress.csv",
+								"fileSystem": "curation"
+							},
+							"sinkValidation": {
+								"filePath": "validation/bss/dynamics/debtors/ntt_breathingspacedebtor_inss_inssaddress.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "df_curation_validation_debtoreligibilitystatustype",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_validation_debtoreligibilitystatustype",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceStaging": {
+								"filePath": "staging/bss/dynamics/debtors/ntt_debtoreligibilitystatustype.csv",
+								"fileSystem": "curation"
+							},
+							"sinkValidation": {
+								"filePath": "validation/bss/dynamics/debtors/ntt_debtoreligibilitystatustype.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "df_curation_validation_debtoreligibilityrevstatustype",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_validation_debtoreligibilityreviewstatustype",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceStaging": {
+								"filePath": "staging/bss/dynamics/debtors/ntt_debtoreligibilityreviewstatustype.csv",
+								"fileSystem": "curation"
+							},
+							"sinkValidation": {
+								"filePath": "validation/bss/dynamics/debtors/ntt_debtoreligibilityreviewstatustype.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "df_curation_validation_debtoreligibilityreview",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_validation_debtoreligibilityreview",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceStaging": {
+								"filePath": "staging/bss/dynamics/debtors/ntt_debtoreligibilityreview.csv",
+								"fileSystem": "curation"
+							},
+							"sinkValidation": {
+								"filePath": "validation/bss/dynamics/debtors/ntt_debtoreligibilityreview.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Transform/BSS/Validation"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-04-14T23:24:02Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,47 @@
+{
+	"name": "df_curation_validation_breathingspacemoratorium",
+	"properties": {
+		"folder": {
+			"name": "Transform/BSS/Moratoriums"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceStaging"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sinkValidation"
+				}
+			],
+			"transformations": [
+				{
+					"name": "decolTypeConvertion"
+				},
+				{
+					"name": "dcolIsValid"
+				},
+				{
+					"name": "dcolMandatoryValue"
+				},
+				{
+					"name": "dcolIsTruncate"
+				},
+				{
+					"name": "dcolMandatoryTruncate"
+				}
+			],
+			"script": "source(output(\n\t\tstatecode as string,\n\t\tstatuscode as string,\n\t\tntt_breathingspacetypeid as string,\n\t\tcreatedon as string,\n\t\tntt_debtorid as string,\n\t\townerid as string,\n\t\tmodifiedon as string,\n\t\tntt_activeregister as string,\n\t\tntt_triggerpointofcontactsubmitnotification as string,\n\t\tmodifiedby as string,\n\t\tntt_referencenumber as string,\n\t\tntt_triggerdebtorsubmitnotification as string,\n\t\tcreatedby as string,\n\t\tntt_breathingspacestatusid as string,\n\t\towningbusinessunit as string,\n\t\tntt_breathingspacemoratoriumid as string,\n\t\tntt_name as string,\n\t\towninguser as string,\n\t\tntt_midwayquestionanswer as string,\n\t\tntt_commencementdate as string,\n\t\tntt_retentionperiodenddate as string,\n\t\tntt_retentionperiodstartdate as string,\n\t\tntt_closuredate as string,\n\t\tntt_submissiondate as string,\n\t\tntt_activeregisterperiodstartdate as string,\n\t\tntt_parentcancellationreasonid as string,\n\t\tntt_expirydate as string,\n\t\tntt_activeregisterperiodenddate as string,\n\t\tntt_midwayquestionrequired as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceStaging\nsourceStaging derive(tsCreatedOn = toTimestamp(createdon),\n\t\ttsModifiedOn = toTimestamp(modifiedon),\n\t\ttsNTTActiveRegisterPeriodStartDate = toTimestamp(ntt_activeregisterperiodstartdate),\n\t\tstrNTTBreathingSpaceMoratoriumId = toString(ntt_breathingspacemoratoriumid),\n\t\tstrNTTBreathingSpaceStatusId = toString(ntt_breathingspacestatusid),\n\t\tstrNTTBreathingSpaceTypeId = toString(ntt_breathingspacetypeid),\n\t\ttsNTTClosureDate = toTimestamp(ntt_closuredate),\n\t\ttsNTTCommencementDate = toTimestamp(ntt_commencementdate),\n\t\tstrNTTDebtorId = toString(ntt_debtorid),\n\t\ttsNTTExpiryDate = toTimestamp(ntt_expirydate),\n\t\tstrNTTParentCancellationReasonId = toString(ntt_parentcancellationreasonid),\n\t\ttsNTTSubmissionDate = toTimestamp(ntt_submissiondate),\n\t\tstrNTTChildCancellationReasonId = toString(byName('ntt_childcancellationreasonid')),\n\t\tblNTTCreatedFromAPI = toBoolean(byName('ntt_createdfromapi')),\n\t\tstrNTTManagingMoneyAdviserOrganisationId = toString(byName('ntt_managingmoneyadviserorganisationid')),\n\t\tblNTTActiveRegister = toBoolean(ntt_activeregister),\n\t\ttsNTTRemovedFromRegisterDate = toTimestamp(byName('ntt_removedfromregisterdate'))) ~> decolTypeConvertion\ndecolTypeConvertion derive(blIsValid = iif(isNull(tsCreatedOn) || isNull(tsModifiedOn) || isNull(strNTTBreathingSpaceMoratoriumId) || isNull(blNTTCreatedFromAPI) || isNull(blNTTActiveRegister) || isNull(tsNTTCommencementDate) || isNull(tsNTTClosureDate) || isNull(tsNTTExpiryDate) || isNull(tsNTTSubmissionDate) || isNull(tsNTTActiveRegisterPeriodStartDate) || isNull(tsNTTRemovedFromRegisterDate) ||\r\n(tsNTTCommencementDate < toTimestamp('1900-01-01 00:00:00') || tsNTTCommencementDate > toTimestamp('2062-08-12 00:00:00')) ||\r\n(tsNTTClosureDate < toTimestamp('1900-01-01 00:00:00') || tsNTTClosureDate > toTimestamp('2062-08-12 00:00:00')) ||\r\n(tsNTTExpiryDate < toTimestamp('1900-01-01 00:00:00') || tsNTTExpiryDate > toTimestamp('2062-08-12 00:00:00')) ||\r\n(tsNTTSubmissionDate < toTimestamp('1900-01-01 00:00:00') || tsNTTSubmissionDate > toTimestamp('2062-08-12 00:00:00')) ||\r\n(tsNTTActiveRegisterPeriodStartDate < toTimestamp('1900-01-01 00:00:00') || tsNTTActiveRegisterPeriodStartDate > toTimestamp('2062-08-12 00:00:00')) ||\r\n(tsNTTRemovedFromRegisterDate < toTimestamp('1900-01-01 00:00:00') || tsNTTRemovedFromRegisterDate > toTimestamp('2062-08-12 00:00:00'))\r\n,toBoolean('0'), toBoolean('1'))) ~> dcolIsValid\ndcolIsValid derive(tsCreatedOn = coalesce(tsCreatedOn, toTimestamp('1900-01-01 00:00:00')),\n\t\ttsModifiedOn = coalesce(tsModifiedOn, toTimestamp('1900-01-01 00:00:00')),\n\t\ttsNTTActiveRegisterPeriodStartDate = iif(isNull(tsNTTActiveRegisterPeriodStartDate) || (tsNTTActiveRegisterPeriodStartDate < toTimestamp('1900-01-01 00:00:00') || tsNTTActiveRegisterPeriodStartDate > toTimestamp('2062-08-12 00:00:00')), toTimestamp('1900-01-01 00:00:00'), tsNTTActiveRegisterPeriodStartDate),\n\t\tstrNTTBreathingSpaceMoratoriumId = coalesce(strNTTBreathingSpaceMoratoriumId, 'missing'),\n\t\tstrNTTBreathingSpaceStatusId = coalesce(strNTTBreathingSpaceStatusId, 'missing'),\n\t\tstrNTTBreathingSpaceTypeId = coalesce(strNTTBreathingSpaceTypeId, 'missing'),\n\t\tstrNTTChildCancellationReasonId = coalesce(strNTTChildCancellationReasonId, 'missing'),\n\t\ttsNTTClosureDate = iif(isNull(tsNTTClosureDate) || (tsNTTClosureDate < toTimestamp('1900-01-01 00:00:00') || tsNTTClosureDate > toTimestamp('2062-08-12 00:00:00')),toTimestamp('1900-01-01 00:00:00'), tsNTTClosureDate),\n\t\ttsNTTCommencementDate = iif(isNull(tsNTTCommencementDate) || (tsNTTCommencementDate < toTimestamp('1900-01-01 00:00:00') || tsNTTCommencementDate > toTimestamp('2062-08-12 00:00:00'))\r\n,toTimestamp('1900-01-01 00:00:00'), tsNTTCommencementDate),\n\t\tblNTTCreatedFromAPI = coalesce(blNTTCreatedFromAPI, toBoolean('false')),\n\t\tstrNTTDebtorId = coalesce(strNTTDebtorId, 'missing'),\n\t\ttsNTTExpiryDate = iif(isNull(tsNTTExpiryDate) || (tsNTTExpiryDate < toTimestamp('1900-01-01 00:00:00') || tsNTTExpiryDate > toTimestamp('2062-08-12 00:00:00')),toTimestamp('1900-01-01 00:00:00'), tsNTTExpiryDate),\n\t\tstrNTTManagingMoneyAdviserOrganisationId = coalesce(strNTTManagingMoneyAdviserOrganisationId, 'missing'),\n\t\tstrNTTParentCancellationReasonId = coalesce(strNTTParentCancellationReasonId, 'missing'),\n\t\ttsNTTRemovedFromRegisterDate = iif(isNull(tsNTTRemovedFromRegisterDate) || (tsNTTRemovedFromRegisterDate < toTimestamp('1900-01-01 00:00:00') || tsNTTRemovedFromRegisterDate > toTimestamp('2062-08-12 00:00:00'))\r\n,toTimestamp('1900-01-01 00:00:00'), tsNTTRemovedFromRegisterDate),\n\t\ttsNTTSubmissionDate = iif(isNull(tsNTTSubmissionDate) || (tsNTTSubmissionDate < toTimestamp('1900-01-01 00:00:00') || tsNTTSubmissionDate > toTimestamp('2062-08-12 00:00:00')),toTimestamp('1900-01-01 00:00:00'), tsNTTSubmissionDate),\n\t\tblNTTActiveRegister = coalesce(blNTTActiveRegister, toBoolean('false'))) ~> dcolMandatoryValue\ndcolMandatoryValue derive(blIsTruncate = iif(length(strNTTBreathingSpaceMoratoriumId) > 36, toBoolean('1'), toBoolean('0'))) ~> dcolIsTruncate\ndcolIsTruncate derive(strNTTBreathingSpaceMoratoriumId = left(strNTTBreathingSpaceMoratoriumId, 36),\n\t\tstrNTTBreathingSpaceStatusId = left(strNTTBreathingSpaceStatusId, 36),\n\t\tstrNTTBreathingSpaceTypeId = left(strNTTBreathingSpaceTypeId, 36),\n\t\tstrNTTChildCancellationReasonId = left(strNTTChildCancellationReasonId, 36),\n\t\tstrNTTDebtorId = left(strNTTDebtorId, 36),\n\t\tstrNTTManagingMoneyAdviserOrganisationId = left(strNTTManagingMoneyAdviserOrganisationId, 36),\n\t\tstrNTTParentCancellationReasonId = left(strNTTParentCancellationReasonId, 36)) ~> dcolMandatoryTruncate\ndcolMandatoryTruncate sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\ttruncate: true,\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sinkValidation"
+		}
+	}
+}

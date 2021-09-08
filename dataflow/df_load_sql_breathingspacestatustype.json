@@ -1,0 +1,44 @@
+{
+	"name": "df_load_sql_breathingspacestatustype",
+	"properties": {
+		"folder": {
+			"name": "Load/BSS"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_reporting_adls",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sourceODS"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_reporting_mssql",
+						"type": "DatasetReference"
+					},
+					"name": "sinkSQL"
+				}
+			],
+			"transformations": [
+				{
+					"name": "AlterRowSQL"
+				},
+				{
+					"name": "SelectODS"
+				},
+				{
+					"name": "dcolSQL"
+				},
+				{
+					"name": "FilterODS"
+				}
+			],
+			"script": "parameters{\n\tpartdistFrom as string\n}\nsource(output(\n\t\torganizationid as string,\n\t\tntt_identifier as string,\n\t\tntt_name as string,\n\t\tstatecode as string,\n\t\tstatuscode as string,\n\t\tcreatedby as string,\n\t\tmodifiedon as string,\n\t\tmodifiedby as string,\n\t\tcreatedon as string,\n\t\tntt_breathingspacestatustypeid as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date,\n\t\tblIsValid as boolean,\n\t\ttsModifiedOn as timestamp,\n\t\ttsCreatedOn as timestamp,\n\t\tstrNTTBreathingSpaceStatusTypeId as string,\n\t\tstrNTTName as string,\n\t\tblIsTruncate as boolean\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'delta',\n\tfileSystem: 'curation',\n\tfolderPath: 'ods/bss/dynamics/references-bss/breathingspacestatustype') ~> sourceODS\ndcolSQL alterRow(upsertIf(true())) ~> AlterRowSQL\nFilterODS select(mapColumn(\n\t\tbatch_id = intBatchId,\n\t\tpartdist,\n\t\tisValid = blIsValid,\n\t\tmodifiedon = tsModifiedOn,\n\t\tcreatedon = tsCreatedOn,\n\t\tntt_breathingspacestatustypeid = strNTTBreathingSpaceStatusTypeId,\n\t\tntt_name = strNTTName,\n\t\tisTruncate = blIsTruncate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectODS\nSelectODS derive(ntt_name = coalesce(ntt_name, 'unknown')) ~> dcolSQL\nsourceODS filter(partdist >= toDate($partdistFrom)) ~> FilterODS\nAlterRowSQL sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['ntt_breathingspacestatustypeid'],\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sinkSQL"
+		}
+	}
+}

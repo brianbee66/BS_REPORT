@@ -1,0 +1,18 @@
+{
+	"name": "ls-govuknotify-postgres",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzurePostgreSql",
+		"typeProperties": {
+			"connectionString": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "ls_reporting_akv",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "constr-psql-notifications01"
+			}
+		}
+	}
+}

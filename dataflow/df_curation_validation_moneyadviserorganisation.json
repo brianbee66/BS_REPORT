@@ -1,0 +1,47 @@
+{
+	"name": "df_curation_validation_moneyadviserorganisation",
+	"properties": {
+		"folder": {
+			"name": "Transform/BSS/Money Advisers"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceStaging"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sinkValidation"
+				}
+			],
+			"transformations": [
+				{
+					"name": "decolTypeConvertion"
+				},
+				{
+					"name": "dcolIsValid"
+				},
+				{
+					"name": "dcolMandatoryValue"
+				},
+				{
+					"name": "dcolIsTruncate"
+				},
+				{
+					"name": "dcolMandatoryTruncate"
+				}
+			],
+			"script": "source(output(\n\t\towningbusinessunit as string,\n\t\tmodifiedon as string,\n\t\tinss_companyregistrationnumber as string,\n\t\tstatecode as string,\n\t\tstatuscode as string,\n\t\tcreatedby as string,\n\t\tinss_fcaexemption as string,\n\t\tinss_englandwalesregistered as string,\n\t\townerid as string,\n\t\tinss_moneyadviserorganisationid as string,\n\t\towninguser as string,\n\t\tmodifiedby as string,\n\t\tcreatedon as string,\n\t\tinss_name as string,\n\t\tinss_tradingbrand as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceStaging\nsourceStaging derive(tsCreatedOn = toTimestamp(createdon),\n\t\ttsModifiedOn = toTimestamp(modifiedon),\n\t\tstrINSSMoneyAdviserOrganisationId = toString(inss_moneyadviserorganisationid),\n\t\tstrINSSName = toString(inss_name)) ~> decolTypeConvertion\ndecolTypeConvertion derive(blIsValid = iif(isNull(tsCreatedOn) || isNull(tsModifiedOn) || isNull(strINSSMoneyAdviserOrganisationId) || isNull(strINSSName), toBoolean('0'), toBoolean('1'))) ~> dcolIsValid\ndcolIsValid derive(tsCreatedOn = coalesce(tsCreatedOn, toTimestamp('1900-01-01 00:00:00')),\n\t\ttsModifiedOn = coalesce(tsModifiedOn, toTimestamp('1900-01-01 00:00:00')),\n\t\tstrINSSMoneyAdviserOrganisationId = coalesce(strINSSMoneyAdviserOrganisationId,'missing'),\n\t\tstrINSSName = coalesce(strINSSName, 'missing')) ~> dcolMandatoryValue\ndcolMandatoryValue derive(blIsTruncate = iif(length(strINSSMoneyAdviserOrganisationId) > 36 || length(strINSSName) > 500, toBoolean('1'), toBoolean('0'))) ~> dcolIsTruncate\ndcolIsTruncate derive(strINSSMoneyAdviserOrganisationId = left(strINSSMoneyAdviserOrganisationId, 36),\n\t\tstrINSSName = left(strINSSName, 500)) ~> dcolMandatoryTruncate\ndcolMandatoryTruncate sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\ttruncate: true,\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sinkValidation"
+		}
+	}
+}

@@ -1,0 +1,47 @@
+{
+	"name": "df_curation_validation_breathingspacecreditor",
+	"properties": {
+		"folder": {
+			"name": "Transform/BSS/Creditors"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceStaging"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sinkValidation"
+				}
+			],
+			"transformations": [
+				{
+					"name": "decolTypeConvertion"
+				},
+				{
+					"name": "dcolIsValid"
+				},
+				{
+					"name": "dcolMandatoryValue"
+				},
+				{
+					"name": "dcolIsTruncate"
+				},
+				{
+					"name": "dcolMandatoryTruncate"
+				}
+			],
+			"script": "source(output(\n\t\tntt_notificationemailaddress as string,\n\t\towningbusinessunit as string,\n\t\towninguser as string,\n\t\tntt_name as string,\n\t\tstatecode as string,\n\t\tstatuscode as string,\n\t\timportsequencenumber as string,\n\t\tcreatedby as string,\n\t\tntt_cmpcreditorid as string,\n\t\tntt_breathingspacecreditorid as string,\n\t\townerid as string,\n\t\tmodifiedon as string,\n\t\tntt_notificationaddressid as string,\n\t\tntt_identifier as string,\n\t\tmodifiedby as string,\n\t\tcreatedon as string,\n\t\tntt_adhoccreditorid as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceStaging\nsourceStaging derive(tsCreatedOn = toTimestamp(createdon),\n\t\ttsModifiedOn = toTimestamp(modifiedon),\n\t\tstrNTTBreathingSpaceCreditorId = toString(ntt_breathingspacecreditorid),\n\t\tstrNTTName = toString(ntt_name),\n\t\tstrNTTCMPCreditorId = toString(ntt_cmpcreditorid),\n\t\tstrNTTAdhocCreditorId = toString(ntt_adhoccreditorid)) ~> decolTypeConvertion\ndecolTypeConvertion derive(blIsValid = iif(isNull(tsCreatedOn) || isNull(tsModifiedOn) || isNull(strNTTBreathingSpaceCreditorId) || isNull(strNTTName) || (isNull(strNTTCMPCreditorId) && isNull(strNTTAdhocCreditorId)), toBoolean('0'), toBoolean('1'))) ~> dcolIsValid\ndcolIsValid derive(tsCreatedOn = coalesce(tsCreatedOn, toTimestamp('1900-01-01 00:00:00')),\n\t\ttsModifiedOn = coalesce(tsModifiedOn, toTimestamp('1900-01-01 00:00:00')),\n\t\tstrNTTBreathingSpaceCreditorId = coalesce(strNTTBreathingSpaceCreditorId,'missing'),\n\t\tstrNTTName = coalesce(strNTTName, 'missing'),\n\t\tstrNTTCMPCreditorId = coalesce(strNTTCMPCreditorId, 'missing'),\n\t\tstrNTTAdhocCreditorId = coalesce(strNTTAdhocCreditorId, 'missing')) ~> dcolMandatoryValue\ndcolMandatoryValue derive(blIsTruncate = iif(length(strNTTBreathingSpaceCreditorId) > 36 || length(strNTTName) > 500 || length(strNTTCMPCreditorId) > 36 || length(strNTTAdhocCreditorId) > 36, toBoolean('1'), toBoolean('0'))) ~> dcolIsTruncate\ndcolIsTruncate derive(strNTTBreathingSpaceCreditorId = left(strNTTBreathingSpaceCreditorId, 36),\n\t\tstrNTTName = left(strNTTName,500),\n\t\tstrNTTCMPCreditorId = left(strNTTCMPCreditorId, 36),\n\t\tstrNTTAdhocCreditorId = left(strNTTAdhocCreditorId, 36)) ~> dcolMandatoryTruncate\ndcolMandatoryTruncate sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\ttruncate: true,\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sinkValidation"
+		}
+	}
+}

@@ -1,0 +1,51 @@
+{
+	"name": "pl-curation-preparation-creditors",
+	"properties": {
+		"activities": [
+			{
+				"name": "df_curation_preparation_breathingspacecreditor",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_preparation_breathingspacecreditor",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceValidationBSCreditor": {
+								"filePath": "validation/bss/dynamics/creditors/ntt_breathingspacecreditor.csv",
+								"fileSystem": "curation"
+							},
+							"sourceBSAdhocCreditor": {
+								"filePath": "validation/bss/dynamics/creditors/ntt_breathingspaceadhoccreditor.csv",
+								"fileSystem": "curation"
+							},
+							"sourceCMPCreditor": {
+								"filePath": "validation/bss/dynamics/creditors/inss_cmpcreditor.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Transform/BSS/Preparation"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-04-14T23:23:58Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

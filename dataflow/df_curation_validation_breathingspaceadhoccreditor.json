@@ -1,0 +1,47 @@
+{
+	"name": "df_curation_validation_breathingspaceadhoccreditor",
+	"properties": {
+		"folder": {
+			"name": "Transform/BSS/Creditors"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceStaging"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sinkValidation"
+				}
+			],
+			"transformations": [
+				{
+					"name": "decolTypeConvertion"
+				},
+				{
+					"name": "dcolIsValid"
+				},
+				{
+					"name": "dcolMandatoryValue"
+				},
+				{
+					"name": "dcolIsTruncate"
+				},
+				{
+					"name": "dcolMandatoryTruncate"
+				}
+			],
+			"script": "source(output(\n\t\towningbusinessunit as string,\n\t\towninguser as string,\n\t\tntt_name as string,\n\t\tstatecode as string,\n\t\tstatuscode as string,\n\t\tcreatedby as string,\n\t\townerid as string,\n\t\tmodifiedon as string,\n\t\tntt_breathingspaceadhoccreditorid as string,\n\t\tmodifiedby as string,\n\t\tcreatedon as string,\n\t\tntt_createdonportal as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceStaging\nsourceStaging derive(tsCreatedOn = toTimestamp(createdon),\n\t\ttsModifiedOn = toTimestamp(modifiedon),\n\t\tstrNTTBreathingSpaceAdhocCreditorId = toString(ntt_breathingspaceadhoccreditorid),\n\t\tstrNTTName = toString(ntt_name)) ~> decolTypeConvertion\ndecolTypeConvertion derive(blIsValid = iif(isNull(tsCreatedOn) || isNull(tsModifiedOn) || isNull(strNTTBreathingSpaceAdhocCreditorId) || isNull(strNTTName), toBoolean('0'), toBoolean('1'))) ~> dcolIsValid\ndcolIsValid derive(tsCreatedOn = coalesce(tsCreatedOn, toTimestamp('1900-01-01 00:00:00')),\n\t\ttsModifiedOn = coalesce(tsModifiedOn, toTimestamp('1900-01-01 00:00:00')),\n\t\tstrNTTBreathingSpaceAdhocCreditorId = coalesce(strNTTBreathingSpaceAdhocCreditorId,'missing'),\n\t\tstrNTTName = coalesce(strNTTName, 'missing')) ~> dcolMandatoryValue\ndcolMandatoryValue derive(blIsTruncate = iif(length(strNTTBreathingSpaceAdhocCreditorId) > 36 || length(strNTTName) > 500, toBoolean('1'), toBoolean('0'))) ~> dcolIsTruncate\ndcolIsTruncate derive(strNTTBreathingSpaceAdhocCreditorId = left(strNTTBreathingSpaceAdhocCreditorId, 36),\n\t\tstrNTTName = left(strNTTName, 500)) ~> dcolMandatoryTruncate\ndcolMandatoryTruncate sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\ttruncate: true,\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sinkValidation"
+		}
+	}
+}

@@ -1,0 +1,38 @@
+{
+	"name": "ds_adlsfs_parquet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_reporting_adls",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"filePath": {
+				"type": "string"
+			},
+			"fileSystem": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "BSS/ADLS"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@dataset().filePath",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().fileSystem",
+					"type": "Expression"
+				}
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

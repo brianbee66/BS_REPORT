@@ -1,0 +1,73 @@
+{
+	"name": "df_curation_preparation_breathingspacecreditor",
+	"properties": {
+		"folder": {
+			"name": "Transform/BSS/Creditors"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceValidationBSCreditor"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceBSAdhocCreditor"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceCMPCreditor"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_reporting_adls",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkODS"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectBSCreditor"
+				},
+				{
+					"name": "AlterRowSink"
+				},
+				{
+					"name": "SelectBSAdhocCreditor"
+				},
+				{
+					"name": "SelectCMPCreditor"
+				},
+				{
+					"name": "JoinCMPCreditor"
+				},
+				{
+					"name": "JoinAdhocCreditor"
+				},
+				{
+					"name": "DerivedColumnAdhocCreditor"
+				},
+				{
+					"name": "DerivedColumnCMPCreditor"
+				},
+				{
+					"name": "DerivedColumnCreditorType"
+				}
+			],
+			"script": "source(output(\n\t\tntt_notificationemailaddress as string,\n\t\towningbusinessunit as string,\n\t\towninguser as string,\n\t\tntt_name as string,\n\t\tstatecode as string,\n\t\tstatuscode as string,\n\t\timportsequencenumber as string,\n\t\tcreatedby as string,\n\t\tntt_cmpcreditorid as string,\n\t\tntt_breathingspacecreditorid as string,\n\t\townerid as string,\n\t\tmodifiedon as string,\n\t\tntt_notificationaddressid as string,\n\t\tntt_identifier as string,\n\t\tmodifiedby as string,\n\t\tcreatedon as string,\n\t\tntt_adhoccreditorid as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date,\n\t\tblIsValid as boolean,\n\t\ttsCreatedOn as timestamp,\n\t\ttsModifiedOn as timestamp,\n\t\tstrNTTBreathingSpaceCreditorId as string,\n\t\tstrNTTName as string,\n\t\tblIsTruncate as boolean,\n\t\tstrNTTCMPCreditorId as string,\n\t\tstrNTTAdhocCreditorId as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceValidationBSCreditor\nsource(output(\n\t\towningbusinessunit as string,\n\t\towninguser as string,\n\t\tntt_name as string,\n\t\tstatecode as string,\n\t\tstatuscode as string,\n\t\tcreatedby as string,\n\t\townerid as string,\n\t\tmodifiedon as string,\n\t\tntt_breathingspaceadhoccreditorid as string,\n\t\tmodifiedby as string,\n\t\tcreatedon as string,\n\t\tntt_createdonportal as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date,\n\t\tblIsValid as boolean,\n\t\ttsCreatedOn as timestamp,\n\t\ttsModifiedOn as timestamp,\n\t\tstrNTTBreathingSpaceAdhocCreditorId as string,\n\t\tstrNTTName as string,\n\t\tblIsTruncate as boolean,\n\t\tstrNTTBreathingSpaceDebtorId as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceBSAdhocCreditor\nsource(output(\n\t\tinss_identifier as string,\n\t\towningbusinessunit as string,\n\t\townerid as string,\n\t\tstatuscode as string,\n\t\timportsequencenumber as string,\n\t\tcreatedby as string,\n\t\tinss_englandwalesregistered as string,\n\t\tinss_cmpcreditorid as string,\n\t\tmodifiedon as string,\n\t\towninguser as string,\n\t\tmodifiedby as string,\n\t\tcreatedon as string,\n\t\tstatecode as string,\n\t\tinss_name as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date,\n\t\tblIsValid as boolean,\n\t\ttsCreatedOn as timestamp,\n\t\ttsModifiedOn as timestamp,\n\t\tstrINSSCMPCreditorId as string,\n\t\tstrINSSName as string,\n\t\tblIsTruncate as boolean\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceCMPCreditor\nDerivedColumnCreditorType select(mapColumn(\n\t\tntt_notificationemailaddress,\n\t\towningbusinessunit,\n\t\towninguser,\n\t\tntt_name,\n\t\tstatecode,\n\t\tstatuscode,\n\t\timportsequencenumber,\n\t\tcreatedby,\n\t\tntt_cmpcreditorid,\n\t\tntt_breathingspacecreditorid,\n\t\townerid,\n\t\tmodifiedon,\n\t\tntt_notificationaddressid,\n\t\tntt_identifier,\n\t\tmodifiedby,\n\t\tcreatedon,\n\t\tntt_adhoccreditorid,\n\t\tintBatchId,\n\t\tpartdist,\n\t\tblIsValid,\n\t\ttsCreatedOn,\n\t\ttsModifiedOn,\n\t\tstrNTTBreathingSpaceCreditorId,\n\t\tstrNTTName,\n\t\tblIsTruncate,\n\t\tstrNTTCMPCreditorId,\n\t\tstrNTTAdhocCreditorId,\n\t\tstrINSSCMPCreditorId,\n\t\tstrINSSCMPCreditorName,\n\t\tstrCMPCreditorType,\n\t\tstrNTTBreathingSpaceAdhocCreditorId,\n\t\tstrNTTBreathingSpaceAdhocCreditorName,\n\t\tstrAdhocCreditorType,\n\t\tstrCreditorType\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectBSCreditor\nSelectBSCreditor alterRow(upsertIf(true())) ~> AlterRowSink\nsourceBSAdhocCreditor select(mapColumn(\n\t\tstrNTTBreathingSpaceAdhocCreditorId,\n\t\tstrNTTBreathingSpaceAdhocCreditorName = strNTTName\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectBSAdhocCreditor\nsourceCMPCreditor select(mapColumn(\n\t\tstrINSSCMPCreditorId,\n\t\tstrINSSCMPCreditorName = strINSSName\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectCMPCreditor\nsourceValidationBSCreditor, DerivedColumnCMPCreditor join(strNTTCMPCreditorId == strINSSCMPCreditorId,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinCMPCreditor\nJoinCMPCreditor, DerivedColumnAdhocCreditor join(strNTTAdhocCreditorId == strNTTBreathingSpaceAdhocCreditorId,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinAdhocCreditor\nSelectBSAdhocCreditor derive(strAdhocCreditorType = \"Adhoc\") ~> DerivedColumnAdhocCreditor\nSelectCMPCreditor derive(strCMPCreditorType = \"CMP\") ~> DerivedColumnCMPCreditor\nJoinAdhocCreditor derive(strCreditorType = coalesce(strAdhocCreditorType, strCMPCreditorType, 'BSS')) ~> DerivedColumnCreditorType\nAlterRowSink sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'delta',\n\tfileSystem: 'curation',\n\tfolderPath: 'ods/bss/dynamics/creditors/breathingspacecreditor',\n\tmergeSchema: false,\n\tautoCompact: false,\n\toptimizedWrite: false,\n\tvacuum: 0,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['strNTTBreathingSpaceCreditorId'],\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('key',\n\t\t0,\n\t\tpartdist\n\t)) ~> sinkODS"
+		}
+	}
+}

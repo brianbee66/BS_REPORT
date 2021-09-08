@@ -1,0 +1,133 @@
+{
+	"name": "pl-curation-preparation-references-bss",
+	"properties": {
+		"activities": [
+			{
+				"name": "df_curation_preparation_breathingspacestatustype",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_preparation_breathingspacestatustype",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceValidation": {
+								"filePath": "validation/bss/dynamics/references-bss/ntt_breathingspacestatustype.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "df_curation_preparation_breathingspacetype",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_preparation_breathingspacetype",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceValidation": {
+								"filePath": "validation/bss/dynamics/references-bss/ntt_breathingspacetype.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "df_curation_preparation_debttype",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_preparation_debttype",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceValidation": {
+								"filePath": "validation/bss/dynamics/references-bss/inss_debttype.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "df_curation_preparation_customaudit",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_preparation_customaudit",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceValidation": {
+								"filePath": "validation/bss/dynamics/references-bss/ntt_customaudit.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Transform/BSS/Preparation"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-04-14T23:24:01Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,47 @@
+{
+	"name": "pl-curation-validation-money_advisers",
+	"properties": {
+		"activities": [
+			{
+				"name": "df_curation_validation_moneyadviserorganisation",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_curation_validation_moneyadviserorganisation",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceStaging": {
+								"filePath": "staging/bss/dynamics/money_advisers/inss_moneyadviserorganisation.csv",
+								"fileSystem": "curation"
+							},
+							"sinkValidation": {
+								"filePath": "validation/bss/dynamics/money_advisers/inss_moneyadviserorganisation.csv",
+								"fileSystem": "curation"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "ir-uksouth-ermdf01",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Transform/BSS/Validation"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-04-14T23:24:00Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,9 @@
+{
+	"name": "inss-adf-erbsspub02-dev",
+	"location": "uksouth",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "f701115d-d31a-4ef5-af50-998de6eb30b2",
+		"tenantId": "9a18d34a-f01e-4c31-ad16-523150b47949"
+	}
+}

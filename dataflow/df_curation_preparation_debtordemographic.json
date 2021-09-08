@@ -1,0 +1,111 @@
+{
+	"name": "df_curation_preparation_debtordemographic",
+	"properties": {
+		"folder": {
+			"name": "Transform/BSS/Debtors"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceAddress"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceNSPL"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceCountry"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceCounty"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceLAUA"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceRegion"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourcePCON"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceDebtorAddress"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_reporting_adls",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkDebtorDemographic"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectNSPL"
+				},
+				{
+					"name": "JoinAddress"
+				},
+				{
+					"name": "JoinNSPL"
+				},
+				{
+					"name": "LookupCountry"
+				},
+				{
+					"name": "LookupCounty"
+				},
+				{
+					"name": "LookupRegion"
+				},
+				{
+					"name": "LookupLAUA"
+				},
+				{
+					"name": "LookupPCON"
+				},
+				{
+					"name": "SelectDebtorDemographic"
+				},
+				{
+					"name": "AlterRowDebtorDemographic"
+				}
+			],
+			"script": "source(output(\n\t\tinss_postcode as string,\n\t\tstatecode as string,\n\t\tstatuscode as string,\n\t\tntt_activeregister as string,\n\t\towningbusinessunit as string,\n\t\tinss_country as string,\n\t\tinss_addresstype as string,\n\t\tinss_addressline2 as string,\n\t\tinss_addressline3 as string,\n\t\townerid as string,\n\t\tinss_addressline1 as string,\n\t\tmodifiedon as string,\n\t\tinss_addressline4 as string,\n\t\tinss_addressline5 as string,\n\t\towninguser as string,\n\t\tmodifiedby as string,\n\t\tinss_name as string,\n\t\tinss_inssaddressid as string,\n\t\tcreatedon as string,\n\t\tcreatedby as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date,\n\t\tblIsValid as boolean,\n\t\tstrInssPostcode as string,\n\t\tstrInssInssAddressId as string,\n\t\ttsModifiedOn as timestamp,\n\t\ttsCreatedOn as timestamp,\n\t\ttsINSSDateFrom as timestamp,\n\t\ttsINSSDateTo as timestamp,\n\t\tblIsTruncate as boolean\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceAddress\nsource(output(\n\t\tpcd as string,\n\t\tpcd2 as string,\n\t\tpcds as string,\n\t\tdointr as string,\n\t\tdoterm as string,\n\t\tusertype as string,\n\t\toseast1m as string,\n\t\tosnrth1m as string,\n\t\tosgrdind as string,\n\t\toa11 as string,\n\t\tcty as string,\n\t\tced as string,\n\t\tlaua as string,\n\t\tward as string,\n\t\thlthau as string,\n\t\tnhser as string,\n\t\tctry as string,\n\t\trgn as string,\n\t\tpcon as string,\n\t\teer as string,\n\t\tteclec as string,\n\t\tttwa as string,\n\t\tpct as string,\n\t\tnuts as string,\n\t\tpark as string,\n\t\tlsoa11 as string,\n\t\tmsoa11 as string,\n\t\twz11 as string,\n\t\tccg as string,\n\t\tbua11 as string,\n\t\tbuasd11 as string,\n\t\tru11ind as string,\n\t\toac11 as string,\n\t\tlat as string,\n\t\tlong as string,\n\t\tlep1 as string,\n\t\tlep2 as string,\n\t\tpfa as string,\n\t\timd as string,\n\t\tcalncv as string,\n\t\tstp as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> sourceNSPL\nsource(output(\n\t\tCTRY12CD as string,\n\t\tCTRY12CDO as string,\n\t\tCTRY12NM as string,\n\t\tCTRY12NMW as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> sourceCountry\nsource(output(\n\t\tCTY20CD as string,\n\t\tCTY20NM as string,\n\t\t{_c2} as string,\n\t\t{_c3} as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> sourceCounty\nsource(output(\n\t\tLAD20CD as string,\n\t\tLAD20NM as string,\n\t\tLAD20NMW as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> sourceLAUA\nsource(output(\n\t\tGOR10CD as string,\n\t\tGOR10CDO as string,\n\t\tGOR10NM as string,\n\t\tGOR10NMW as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> sourceRegion\nsource(output(\n\t\tPCON14CD as string,\n\t\tPCON14NM as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> sourcePCON\nsource(output(\n\t\tntt_breathingspacedebtor_inss_inssaddressid as string,\n\t\tinss_inssaddressid as string,\n\t\tntt_breathingspacedebtorid as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date,\n\t\tblIsValid as boolean,\n\t\tblIsTruncate as boolean,\n\t\tstrNTTBreathingSpaceDebtorInssInssAddressId as string,\n\t\tstrInssInssAddressId as string,\n\t\tstrNTTBreathingSpaceDebtorId as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceDebtorAddress\nsourceNSPL select(mapColumn(\n\t\tpcd,\n\t\tpcd2,\n\t\tpcds,\n\t\tcty,\n\t\tlaua,\n\t\tctry,\n\t\trgn,\n\t\tpcon,\n\t\tlat,\n\t\tlong,\n\t\tintBatchId,\n\t\tpartdist\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectNSPL\nsourceDebtorAddress, sourceAddress join(sourceDebtorAddress@strInssInssAddressId == sourceAddress@strInssInssAddressId,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinAddress\nJoinAddress, SelectNSPL join(strInssPostcode == pcds,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinNSPL\nJoinNSPL, sourceCountry lookup(ctry == CTRY12CD,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupCountry\nLookupCountry, sourceCounty lookup(cty == CTY20CD,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupCounty\nLookupCounty, sourceRegion lookup(rgn == GOR10CD,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupRegion\nLookupRegion, sourceLAUA lookup(laua == LAD20CD,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupLAUA\nLookupLAUA, sourcePCON lookup(pcon == PCON14CD,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupPCON\nLookupPCON select(mapColumn(\n\t\tntt_breathingspacedebtor_inss_inssaddressid,\n\t\tntt_breathingspacedebtorid,\n\t\tstrNTTBreathingSpaceDebtorInssInssAddressId,\n\t\tstrNTTBreathingSpaceDebtorId,\n\t\tmodifiedon,\n\t\tinss_inssaddressid = sourceAddress@inss_inssaddressid,\n\t\tcreatedon,\n\t\tintBatchId = sourceAddress@intBatchId,\n\t\tpartdist = sourceAddress@partdist,\n\t\tblIsValid = sourceAddress@blIsValid,\n\t\tstrInssInssAddressId = sourceAddress@strInssInssAddressId,\n\t\ttsModifiedOn,\n\t\ttsCreatedOn,\n\t\tblIsTruncate = sourceAddress@blIsTruncate,\n\t\tcty,\n\t\tlaua,\n\t\tctry,\n\t\trgn,\n\t\tpcon,\n\t\tlat,\n\t\tlong,\n\t\tcountry = CTRY12NM,\n\t\tcounty = CTY20NM,\n\t\tregion = GOR10NM,\n\t\tlocalauthority = LAD20NM,\n\t\tparliamentaryconstituency = PCON14NM,\n\t\ttsINSSDateFrom,\n\t\ttsINSSDateTo\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectDebtorDemographic\nSelectDebtorDemographic alterRow(upsertIf(true())) ~> AlterRowDebtorDemographic\nAlterRowDebtorDemographic sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'delta',\n\tfileSystem: 'curation',\n\tfolderPath: 'ods/bss/dynamics/debtors/debtordemographic',\n\tmergeSchema: false,\n\tautoCompact: false,\n\toptimizedWrite: false,\n\tvacuum: 0,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['strNTTBreathingSpaceDebtorInssInssAddressId'],\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('key',\n\t\t0,\n\t\tpartdist\n\t)) ~> sinkDebtorDemographic"
+		}
+	}
+}

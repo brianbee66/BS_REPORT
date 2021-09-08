@@ -1,0 +1,38 @@
+{
+	"name": "df_curation_preparation_debteligibilityreview",
+	"properties": {
+		"folder": {
+			"name": "Transform/BSS/Moratoriums"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceValidation"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_reporting_adls",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkODS"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectColumns"
+				},
+				{
+					"name": "AlterRowSink"
+				}
+			],
+			"script": "source(output(\n\t\towningbusinessunit as string,\n\t\tntt_name as string,\n\t\tstatecode as string,\n\t\tstatuscode as string,\n\t\tntt_debteligibilityreviewid as string,\n\t\tcreatedby as string,\n\t\tntt_eligibilitystatusid as string,\n\t\tntt_debteligibilityreviewtypeid as string,\n\t\tntt_creditornotes as string,\n\t\townerid as string,\n\t\tmodifiedon as string,\n\t\tntt_debtid as string,\n\t\towninguser as string,\n\t\tmodifiedby as string,\n\t\tcreatedon as string,\n\t\tntt_courtdecisionnotes as string,\n\t\tntt_moneyadvisernotes as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date,\n\t\tblIsValid as boolean,\n\t\ttsCreatedOn as timestamp,\n\t\ttsModifiedOn as timestamp,\n\t\tstrNTTDebtEligibilityReviewId as string,\n\t\tstrNTTDebtId as string,\n\t\tstrNTTEligibilityStatusId as string,\n\t\tblIsTruncate as boolean\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceValidation\nsourceValidation select(mapColumn(\n\t\towningbusinessunit,\n\t\tntt_name,\n\t\tstatecode,\n\t\tstatuscode,\n\t\tntt_debteligibilityreviewid,\n\t\tcreatedby,\n\t\tntt_eligibilitystatusid,\n\t\tntt_debteligibilityreviewtypeid,\n\t\tntt_creditornotes,\n\t\townerid,\n\t\tmodifiedon,\n\t\tntt_debtid,\n\t\towninguser,\n\t\tmodifiedby,\n\t\tcreatedon,\n\t\tntt_courtdecisionnotes,\n\t\tntt_moneyadvisernotes,\n\t\tintBatchId,\n\t\tpartdist,\n\t\tblIsValid,\n\t\ttsCreatedOn,\n\t\ttsModifiedOn,\n\t\tstrNTTDebtEligibilityReviewId,\n\t\tstrNTTDebtId,\n\t\tstrNTTEligibilityStatusId,\n\t\tblIsTruncate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumns\nSelectColumns alterRow(upsertIf(true())) ~> AlterRowSink\nAlterRowSink sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'delta',\n\tfileSystem: 'curation',\n\tfolderPath: 'ods/bss/dynamics/moratoriums/debteligibilityreview',\n\tmergeSchema: false,\n\tautoCompact: false,\n\toptimizedWrite: false,\n\tvacuum: 0,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['strNTTDebtEligibilityReviewId'],\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('key',\n\t\t0,\n\t\tpartdist\n\t)) ~> sinkODS"
+		}
+	}
+}

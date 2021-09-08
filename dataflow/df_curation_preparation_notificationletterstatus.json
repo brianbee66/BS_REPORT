@@ -1,0 +1,38 @@
+{
+	"name": "df_curation_preparation_notificationletterstatus",
+	"properties": {
+		"folder": {
+			"name": "Transform/BSS/Notifications"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceValidation"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_reporting_adls",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkODS"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectColumns"
+				},
+				{
+					"name": "AlterRowSink"
+				}
+			],
+			"script": "source(output(\n\t\torganizationid as string,\n\t\tntt_notificationletterstatusid as string,\n\t\tntt_identifier as string,\n\t\tstatecode as string,\n\t\tstatuscode as string,\n\t\tcreatedby as string,\n\t\tcreatedon as string,\n\t\tmodifiedon as string,\n\t\tmodifiedby as string,\n\t\tntt_status as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date,\n\t\tblIsValid as boolean,\n\t\ttsModifiedOn as timestamp,\n\t\ttsCreatedOn as timestamp,\n\t\tstrNTTStatus as string,\n\t\tstrNTTNotificationLetterStatusId as string,\n\t\tblIsTruncate as boolean\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceValidation\nsourceValidation select(mapColumn(\n\t\torganizationid,\n\t\tntt_notificationletterstatusid,\n\t\tntt_identifier,\n\t\tstatecode,\n\t\tstatuscode,\n\t\tcreatedby,\n\t\tcreatedon,\n\t\tmodifiedon,\n\t\tmodifiedby,\n\t\tntt_status,\n\t\tintBatchId,\n\t\tpartdist,\n\t\tblIsValid,\n\t\ttsModifiedOn,\n\t\ttsCreatedOn,\n\t\tstrNTTStatus,\n\t\tstrNTTNotificationLetterStatusId,\n\t\tblIsTruncate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumns\nSelectColumns alterRow(upsertIf(true())) ~> AlterRowSink\nAlterRowSink sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'delta',\n\tfileSystem: 'curation',\n\tfolderPath: 'ods/bss/dynamics/notifications/notificationletterstatus',\n\tmergeSchema: false,\n\tautoCompact: false,\n\toptimizedWrite: false,\n\tvacuum: 0,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['strNTTNotificationLetterStatusId'],\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('key',\n\t\t0,\n\t\tpartdist\n\t)) ~> sinkODS"
+		}
+	}
+}

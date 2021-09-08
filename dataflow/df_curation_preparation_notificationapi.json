@@ -1,0 +1,73 @@
+{
+	"name": "df_curation_preparation_notificationapi",
+	"properties": {
+		"folder": {
+			"name": "Transform/BSS/Notifications"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceValidation"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceValidationMoratorium"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_adlsfs_parquet",
+						"type": "DatasetReference"
+					},
+					"name": "sourceValidationDebt"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_reporting_adls",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkODS"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectColumns"
+				},
+				{
+					"name": "AlterRowSink"
+				},
+				{
+					"name": "JoinMoratorium"
+				},
+				{
+					"name": "SelectMoratorium"
+				},
+				{
+					"name": "SelectDebt"
+				},
+				{
+					"name": "JoinDebt"
+				},
+				{
+					"name": "DerivedColumnNotification"
+				},
+				{
+					"name": "DerivedColumnMoratorium"
+				},
+				{
+					"name": "DerivedColumnDebt"
+				}
+			],
+			"script": "source(output(\n\t\tstatecode as string,\n\t\tntt_submissionaccepted as string,\n\t\tregardingobjectid as string,\n\t\tleftvoicemail as string,\n\t\tcreatedon as string,\n\t\tntt_payload as string,\n\t\tisbilled as string,\n\t\tsubject as string,\n\t\townerid as string,\n\t\tmodifiedon as string,\n\t\tntt_templateid as string,\n\t\tversionnumber as string,\n\t\tprioritycode as string,\n\t\tmodifiedby as string,\n\t\tntt_resubmit as string,\n\t\tisregularactivity as string,\n\t\tismapiprivate as string,\n\t\tstatuscode as string,\n\t\tactivitytypecode as string,\n\t\tinstancetypecode as string,\n\t\tntt_lastsubmittedon as string,\n\t\tisworkflowcreated as string,\n\t\tdeliveryprioritycode as string,\n\t\ttimezoneruleversionnumber as string,\n\t\tcreatedby as string,\n\t\towningbusinessunit as string,\n\t\towninguser as string,\n\t\tntt_notificationstatus as string,\n\t\tactivityid as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date,\n\t\tblIsValid as boolean,\n\t\ttsModifiedOn as timestamp,\n\t\ttsCreatedOn as timestamp,\n\t\tstrActivityId as string,\n\t\tblNTTSubmissionAccepted as boolean,\n\t\ttsSentOn as timestamp,\n\t\tstrNTTNotificationStatus as string,\n\t\ttsNTTNotificationStatusUpdated as timestamp,\n\t\tstrNTTTemplateId as string,\n\t\tblIsTruncate as boolean,\n\t\tstrRegardingObjectId as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceValidation\nsource(output(\n\t\tstatecode as string,\n\t\tstatuscode as string,\n\t\tntt_breathingspacetypeid as string,\n\t\tcreatedon as string,\n\t\tntt_debtorid as string,\n\t\townerid as string,\n\t\tmodifiedon as string,\n\t\tntt_activeregister as string,\n\t\tntt_triggerpointofcontactsubmitnotification as string,\n\t\tmodifiedby as string,\n\t\tntt_referencenumber as string,\n\t\tntt_triggerdebtorsubmitnotification as string,\n\t\tcreatedby as string,\n\t\tntt_breathingspacestatusid as string,\n\t\towningbusinessunit as string,\n\t\tntt_breathingspacemoratoriumid as string,\n\t\tntt_name as string,\n\t\towninguser as string,\n\t\tntt_midwayquestionanswer as string,\n\t\tntt_commencementdate as string,\n\t\tntt_retentionperiodenddate as string,\n\t\tntt_retentionperiodstartdate as string,\n\t\tntt_closuredate as string,\n\t\tntt_submissiondate as string,\n\t\tntt_activeregisterperiodstartdate as string,\n\t\tntt_parentcancellationreasonid as string,\n\t\tntt_expirydate as string,\n\t\tntt_activeregisterperiodenddate as string,\n\t\tntt_midwayquestionrequired as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date,\n\t\tblIsValid as boolean,\n\t\ttsCreatedOn as timestamp,\n\t\ttsModifiedOn as timestamp,\n\t\ttsNTTActiveRegisterPeriodStartDate as timestamp,\n\t\tstrNTTBreathingSpaceMoratoriumId as string,\n\t\tstrNTTBreathingSpaceStatusId as string,\n\t\tstrNTTBreathingSpaceTypeId as string,\n\t\tstrNTTChildCancellationReasonId as string,\n\t\ttsNTTClosureDate as timestamp,\n\t\ttsNTTCommencementDate as timestamp,\n\t\tblNTTCreatedFromAPI as boolean,\n\t\tstrNTTDebtorId as string,\n\t\ttsNTTExpiryDate as timestamp,\n\t\tstrNTTManagingMoneyAdviserOrganisationId as string,\n\t\tstrNTTParentCancellationReasonId as string,\n\t\ttsNTTRemovedFromRegisterSate as timestamp,\n\t\ttsNTTSubmissionDate as timestamp,\n\t\tblIsTruncate as boolean\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceValidationMoratorium\nsource(output(\n\t\tstatecode as string,\n\t\tntt_referencenumber as string,\n\t\tcreatedon as string,\n\t\tntt_triggercreditorsubmitnotification as string,\n\t\tntt_creditorexternalreferenceid as string,\n\t\townerid as string,\n\t\tmodifiedon as string,\n\t\tntt_triggernotification as string,\n\t\tntt_debttypeid as string,\n\t\ttransactioncurrencyid as string,\n\t\tntt_activeregister as string,\n\t\texchangerate as string,\n\t\tmodifiedby as string,\n\t\tntt_amount_base as string,\n\t\tstatuscode as string,\n\t\towningbusinessunit as string,\n\t\tntt_breathingspacedebtid as string,\n\t\tntt_triggercreditorexpirynotification as string,\n\t\tntt_amount as string,\n\t\tcreatedby as string,\n\t\tntt_debtstatusid as string,\n\t\tntt_creditorid as string,\n\t\tntt_breathingspacemoratoriumid as string,\n\t\tntt_name as string,\n\t\towninguser as string,\n\t\tntt_nationalinsurancenumber as string,\n\t\tmodifiedonbehalfby as string,\n\t\tntt_commencementdate as string,\n\t\ttimezoneruleversionnumber as string,\n\t\tntt_expirydate as string,\n\t\tintBatchId as integer,\n\t\tpartdist as date,\n\t\tblIsValid as boolean,\n\t\ttsCreatedOn as timestamp,\n\t\ttsModifiedOn as timestamp,\n\t\tstrNTTBreathingSpaceDebtId as string,\n\t\tblNTTActiveRegister as boolean,\n\t\tdcNTTAmount as decimal(38,4),\n\t\tstrNTTBreathingSpaceMoratoriumId as string,\n\t\tstrNTTCreditorId as string,\n\t\tstrNTTDebtTypeId as string,\n\t\tblIsTruncate as boolean,\n\t\tsteNTTCreditorId as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: true,\n\tformat: 'parquet') ~> sourceValidationDebt\nDerivedColumnNotification select(mapColumn(\n\t\tstatecode,\n\t\tntt_submissionaccepted,\n\t\tregardingobjectid,\n\t\tleftvoicemail,\n\t\tcreatedon,\n\t\tntt_payload,\n\t\tisbilled,\n\t\tsubject,\n\t\townerid,\n\t\tmodifiedon,\n\t\tntt_templateid,\n\t\tversionnumber,\n\t\tprioritycode,\n\t\tmodifiedby,\n\t\tntt_resubmit,\n\t\tisregularactivity,\n\t\tismapiprivate,\n\t\tstatuscode,\n\t\tactivitytypecode,\n\t\tinstancetypecode,\n\t\tntt_lastsubmittedon,\n\t\tisworkflowcreated,\n\t\tdeliveryprioritycode,\n\t\ttimezoneruleversionnumber,\n\t\tcreatedby,\n\t\towningbusinessunit,\n\t\towninguser,\n\t\tntt_notificationstatus,\n\t\tactivityid,\n\t\tintBatchId,\n\t\tpartdist,\n\t\tblIsValid,\n\t\ttsModifiedOn,\n\t\ttsCreatedOn,\n\t\tstrActivityId,\n\t\tblNTTSubmissionAccepted,\n\t\ttsSentOn,\n\t\tstrNTTNotificationStatus,\n\t\ttsNTTNotificationStatusUpdated,\n\t\tstrNTTTemplateId,\n\t\tblIsTruncate,\n\t\tstrRegardingObjectId,\n\t\tstrNTTBreathingSpaceMoratoriumId,\n\t\tstrNotificationMoratorium,\n\t\tstrNTTBreathingSpaceDebtId,\n\t\tstrNotificationDebt,\n\t\tstrNotificationType\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumns\nSelectColumns alterRow(upsertIf(true())) ~> AlterRowSink\nsourceValidation, DerivedColumnMoratorium join(strRegardingObjectId == strNTTBreathingSpaceMoratoriumId,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinMoratorium\nsourceValidationMoratorium select(mapColumn(\n\t\tstrNTTBreathingSpaceMoratoriumId\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectMoratorium\nsourceValidationDebt select(mapColumn(\n\t\tstrNTTBreathingSpaceDebtId\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectDebt\nJoinMoratorium, DerivedColumnDebt join(strRegardingObjectId == strNTTBreathingSpaceDebtId,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinDebt\nJoinDebt derive(strNotificationType = coalesce(strNotificationMoratorium,strNotificationDebt,'unknown'),\n\t\tstrNTTBreathingSpaceMoratoriumId = coalesce(strNTTBreathingSpaceMoratoriumId, 'missing'),\n\t\tstrNTTBreathingSpaceDebtId = coalesce(strNTTBreathingSpaceDebtId, 'missing')) ~> DerivedColumnNotification\nSelectMoratorium derive(strNotificationMoratorium = \"Moratorium\") ~> DerivedColumnMoratorium\nSelectDebt derive(strNotificationDebt = \"Debt\") ~> DerivedColumnDebt\nAlterRowSink sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'delta',\n\tfileSystem: 'curation',\n\tfolderPath: 'ods/bss/dynamics/notifications/notificationapi',\n\tmergeSchema: false,\n\tautoCompact: false,\n\toptimizedWrite: false,\n\tvacuum: 0,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['strActivityId'],\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('key',\n\t\t0,\n\t\tpartdist\n\t)) ~> sinkODS"
+		}
+	}
+}
